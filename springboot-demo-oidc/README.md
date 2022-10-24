@@ -213,12 +213,3 @@ public String profile() {
 }
 ```
 
-## 接下来你可能需要
-
-调用其他资源 API：
-::: page-ref /quickstarts/apiServer/nodeJsExpress/
-:::
-
-自建应用 SSO 方案：
-::: page-ref /guides/app-new/sso/
-:::
