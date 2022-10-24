@@ -8,6 +8,7 @@
     <a href="https://forum.authing.cn/" target="_blank"><img src="https://img.shields.io/badge/chat-forum-blue" /></a>
     <a href="https://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/badge/License-MIT-success" alt="License"></a>
 </div>
+
 **English** | [简体中文](./README.zh_CN.md)
 
 This repo is based on [Authing Java SDK](https://github.com/Authing/authing-py-sdk), contains demos of Java App Demo:
