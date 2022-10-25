@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+    <p>你当前已经登录，接下来你可以：</p>
+    <ul>
+        <li>查看用户信息(要求已登录)：<a th:href="@{/profile}">/profile</a></li>
+        <li>访问一个需要特定权限的端点：<a th:href="@{/checkScope}">/checkScope</a></li>
+        <li>使用 RefreshToken 换取新的 accessToken：<a th:href="@{/refresh}">/refresh</a></li>
+        <li>退出登录：<a th:href="@{/logout}">/logout</a></li>
+    </ul>
+</body>
+</html>
