@@ -29,8 +29,7 @@
 
 你需要先在 Authing 创建一个应用。进入[**控制台**](https://console.authing.cn) > **应用**，点击右上角的「创建自建应用」。
 
-![create-app](images/create-app.png)
-
+<img src="images/create-app.png" alt="drawing" width="400"/>
 
 **应用名称**可以随意填写。
 
@@ -38,7 +37,7 @@
 
 **应用类型**可以随意选择，此处以最常用的「标准 Web 应用」为例。
 
-![create-app-2](images/create-app-2.png)
+<img src="images/create-app-2.png" alt="drawing" width="400"/>
 
 ### 配置应用
 
@@ -46,7 +45,9 @@
 
 向下滑动找到「认证配置」卡片，在**登录回调 URL**栏填入 `http://localhost:8080/callback` 。当用户在 Authing 完成认证后，Authing 会将用户重定向到该回调地址；在**登出回调 URL**栏填入 `http://www.baidu.com` 。当用户在 Authing 完成退出后，Authing 会将用户重定向到登出回调地址。
 
-![config-app](images/config-app.png)
+<img src="images/config-app.png" alt="drawing" width="400"/>
+
+
 
 配置完成后，不要忘记**单击对应的「保存」按钮**保存你的设置。
 
@@ -67,14 +68,18 @@
 ### 在线创建项目
 访问 [Spring Initializr](https://start.spring.io/) ，参考图中配置创建 Spring Boot 项目：
 
-![online-init](images/online-init.png)
+<img src="images/online-init.png" alt="drawing" width="600"/>
+
+
 
 ### 本地创建项目
 本地打开 IDEA，参考图中配置创建 Spring Boot 项目：
 
-![local-init](images/local-init.png)
+<img src="images/local-init.png" alt="drawing" width="600"/>
 
-![local-init-2](images/local-init-2.png)
+<img src="images/local-init-2.png" alt="drawing" width="600"/>
+
+
 
 为简洁起见，上述两种方法只添加了基础的 Spring MVC 依赖项，其它依赖项可按需添加。
 
@@ -194,7 +199,9 @@ public class DemoController {
 
 效果如下：
 
-![authing-login](images/authing-login.png)
+<img src="images/authing-login.png" alt="drawing" width="400"/>
+
+
 
 用户在此可以使用任何你的应用支持的登录/注册方式进行登录/注册，你可以[阅读此文档](https://docs.authing.co/v2/guides/app-new/create-app/)了解如何为你的应用自定义样式、配置社会化登录、配置 MFA 等。
 
@@ -232,7 +239,7 @@ public class DemoController {
 
 此处回调到 index 页面，效果如下：
 
-![userinfo](images/userinfo.png)
+<img src="images/userinfo.png" alt="drawing" width="600"/>
 
 
 
@@ -275,7 +282,7 @@ public class DemoController {
 
 此处设置回调到 error 页面，效果如下：
 
-![error](images/error.png)
+<img src="images/error.png" alt="drawing" width="400"/>
 
 
 

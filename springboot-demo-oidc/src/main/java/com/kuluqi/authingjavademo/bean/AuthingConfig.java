@@ -16,9 +16,9 @@ public class AuthingConfig {
     public AuthenticationClient authenticationClient() throws IOException, ParseException {
         //在构造函数中分别填入自己的 App ID、App Secret、APP Host和之前设置的回调地址。
         AuthenticationClientOptions options = new AuthenticationClientOptions();
-        options.setAppId("AUTHING_APP_ID");
-        options.setAppSecret("AUTHING_APP_SECRET");
-        options.setAppHost("AUTHING_APP_HOST");
+        options.setAppId("633bdf6dec36475453151590");
+        options.setAppSecret("b6a0918c9a56ab14ebdbc26a29140054");
+        options.setAppHost("https://kuluqi2.authing.cn");
         AuthenticationClient client = new AuthenticationClient(options);
         return client;
     }
