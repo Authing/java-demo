@@ -31,6 +31,10 @@ export default defineComponent({
     YinLoginLogo,
   },
   setup() {
+    let internalInstance = getCurrentInstance();
+    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+
+
     const { proxy } = getCurrentInstance();
     const { routerManager, changeIndex } = mixin();
 
@@ -59,10 +63,11 @@ export default defineComponent({
         });
 
         if (result.success) {
-          proxy.$store.commit("setUserId", result.data[0].id);
-          proxy.$store.commit("setUsername", result.data[0].username);
-          proxy.$store.commit("setUserPic", result.data[0].avator);
+          proxy.$store.commit("setUserId", result.data.consumerList[0].id);
+          proxy.$store.commit("setUsername", result.data.consumerList[0].username);
+          proxy.$store.commit("setUserPic", result.data.consumerList[0].avator);
           proxy.$store.commit("setToken", true);
+          cookies.set("userAccessToken",result.data.accessToken);
           changeIndex(NavName.Home);
           routerManager(RouterName.Home, { path: RouterName.Home });
         }

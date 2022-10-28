@@ -42,15 +42,15 @@ export default defineComponent({
     let cookies = internalInstance.appContext.config.globalProperties.$cookies;
     async function submitForm() {
       let params = new URLSearchParams();
-          params.append("username", ruleForm.username);
-          params.append("password", ruleForm.password);
+      params.append("username", ruleForm.username);
+      params.append("password", ruleForm.password);
       const result = (await HttpManager.getLoginStatus(params)) as ResponseBody;
       (proxy as any).$message({
         message: result.message,
         type: result.type,
       });
-      if (result.success){ 
-        cookies.set("accessToken",result.data);
+      if (result.success){
+        cookies.set("manageAccessToken",result.data);
         routerManager(RouterName.Info, { path: RouterName.Info });
       }
     }

@@ -36,6 +36,9 @@ public class ListSongController {
     @Autowired
     private ManagementClient managementClient;
 
+    @Value("${authing.config.appId}")
+    String AUTHING_APP_ID;
+
     private static final List<String> VIP_LIST;
 
     static {
@@ -96,7 +99,7 @@ public class ListSongController {
      */
     private List<String> getResources(HttpSession session) {
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         getUserRolesDto.setUserId(session.getAttribute("username").toString());
         getUserRolesDto.setUserIdType(ResignUserReqDto.UserIdType.USERNAME.getValue());
         //  调用 authing 接口 (获取用户的角色)
@@ -105,7 +108,7 @@ public class ListSongController {
         List<String> resources = new ArrayList<>();
         roles.forEach((dto) -> {
             GetRoleAuthorizedResourcesDto resourcesDto = new GetRoleAuthorizedResourcesDto();
-            resourcesDto.setNamespace(authenticationClient.getOptions().getAppId());
+            resourcesDto.setNamespace(AUTHING_APP_ID);
             resourcesDto.setCode(dto.getCode());
             resourcesDto.setResourceType(ResourceItemDto.ResourceType.DATA.getValue());
             //  调用 authing 接口 (获取角色的资源)

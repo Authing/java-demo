@@ -23,6 +23,9 @@ public class AdminController {
     @Autowired
     private ManagementClient managementClient;
 
+    @Value("${authing.config.appId}")
+    String AUTHING_APP_ID;
+
     // 判断是否登录成功
     @ResponseBody
     @RequestMapping(value = "/admin/login/status", method = RequestMethod.POST)
@@ -33,6 +36,9 @@ public class AdminController {
         // 调用 authing "用户名+密码"方式的 SDK 登录
         LoginTokenRespDto loginTokenRespDto =
                 authenticationClient.signInByUsernamePassword(username, password, new SignInOptionsDto());
+        if(loginTokenRespDto.getStatusCode() != 200){
+            return new ErrorMessage(loginTokenRespDto.getMessage()).getMessage();
+        }
         //返回结果中层层获取 userId
         String accessToken = loginTokenRespDto.getData().getAccessToken();
         UserInfo userInfo = authenticationClient.getUserInfoByAccessToken(accessToken);
@@ -40,7 +46,7 @@ public class AdminController {
         //通过 userId 获取 用户角色
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
         getUserRolesDto.setUserId(userId);
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         RolePaginatedRespDto rolePaginatedRespDto = managementClient.getUserRoles(getUserRolesDto);
         List<RoleDto> roleDtoList = rolePaginatedRespDto.getData().getList();
         // 将结果类中的角色属性封装成一个 list
@@ -74,7 +80,7 @@ public class AdminController {
      * 登出
      */
     @PostMapping("admin/logout")
-    public Object logout(@CookieValue("accessToken") String accessToken){
+    public Object logout(@CookieValue("manageAccessToken") String accessToken){
         Boolean flag = authenticationClient.revokeToken(accessToken);
         if(flag){
             return new SuccessMessage<>("退出登录").getMessage();

@@ -35,7 +35,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@CrossOrigin
 @RestController
 public class ConsumerController {
 
@@ -47,6 +46,9 @@ public class ConsumerController {
 
     @Autowired
     private AuthenticationClient authenticationClient;
+
+    @Value("${authing.config.appId}")
+    String AUTHING_APP_ID;
 
     @Configuration
     public static class MyPicConfig implements WebMvcConfigurer {
@@ -103,7 +105,7 @@ public class ConsumerController {
         UserSingleRespDto userSingleRespDto = authenticationClient.signUp(signUpDto);
         if (userSingleRespDto.getStatusCode() == 200) {
             AssignRoleDto assignRoleDto = new AssignRoleDto();
-            assignRoleDto.setNamespace(authenticationClient.getOptions().getAppId());
+            assignRoleDto.setNamespace(AUTHING_APP_ID);
             assignRoleDto.setCode(RoleCodeEnum.USER.getValue());
             List<TargetDto> list = new ArrayList<>();
             TargetDto targetDto = new TargetDto();
@@ -142,7 +144,10 @@ public class ConsumerController {
         if (loginTokenRespDto.getStatusCode() == 200) {
             session.setAttribute("username", username);
             //  调用 authing 接口 (登入成功后需要返回所有用户列表)
-            return new SuccessMessage<List<Consumer>>("登录成功", convertConsumers(managementClient.listUsers(listUsersRequestDto).getData().getList())).getMessage();
+            return new SuccessMessage<SignInRes>("登录成功",
+                    new signInRes(loginTokenRespDto.getData().getAccessToken(),
+                            convertConsumers(managementClient.listUsers(listUsersRequestDto).getData().getList()
+                            ))).getMessage();
         } else {
             return new ErrorMessage(loginTokenRespDto.getMessage()).getMessage();
         }
@@ -216,9 +221,9 @@ public class ConsumerController {
 
         //获取用户角色信息
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         getUserRolesDto.setUserId(item.getUserId());
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         //  调用 authing 接口 (获取用户的角色列表并返回)
         RolePaginatedRespDto userRoles = managementClient.getUserRoles(getUserRolesDto);
         List<RoleDto> roles = userRoles.getData().getList();
@@ -241,12 +246,11 @@ public class ConsumerController {
     }
 
     /**
-     * 删除用户
+     * 管理员删除用户
      */
-    @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
-    public Object deleteUser(HttpServletRequest req) {
+    @GetMapping("/user/delete")
+    public Object deleteUserByAdmin(HttpServletRequest req){
         String id = req.getParameter("id");
-
         DeleteUsersBatchDto deleteDto = new DeleteUsersBatchDto();
         deleteDto.setUserIds(Collections.singletonList(id));
         //  调用 authing 接口 (根据 userId 删除用户)
@@ -259,6 +263,35 @@ public class ConsumerController {
     }
 
     /**
+     * 用户自我注销账号
+     */
+    @RequestMapping(value = "/user/deleteSelf", method = RequestMethod.POST)
+    public Object deleteUserBySelf(HttpServletRequest req,@CookieValue("userAccessToken") String accessToken) {
+//        String id = req.getParameter("id");
+        String password = req.getParameter("password");
+        authenticationClient.setAccessToken(accessToken);
+
+        VerifyDeleteAccountRequestDto verifyDeleteAccountRequestDto = new VerifyDeleteAccountRequestDto();
+        verifyDeleteAccountRequestDto.setVerifyMethod(VerifyDeleteAccountRequestDto.VerifyMethod.PASSWORD);
+        DeleteAccountByPasswordDto deleteAccountByPasswordDto = new DeleteAccountByPasswordDto();
+        deleteAccountByPasswordDto.setPassword(password);
+        verifyDeleteAccountRequestDto.setPasswordPayload(deleteAccountByPasswordDto);
+        // 调用 authing 接口
+        VerifyDeleteAccountRequestRespDto verifyDeleteAccountRequestRespDto = authenticationClient.verifyDeleteAccountRequest(verifyDeleteAccountRequestDto);
+        if(verifyDeleteAccountRequestRespDto.getStatusCode() != 200){
+            return new ErrorMessage(verifyDeleteAccountRequestRespDto.getMessage()).getMessage();
+        }
+        String deleteAccountToken = verifyDeleteAccountRequestRespDto.getData().getDeleteAccountToken();
+
+        DeleteAccounDto deleteAccounDto = new DeleteAccounDto();
+        deleteAccounDto.setDeleteAccountToken(deleteAccountToken);
+        // 调用 authing 接口
+        authenticationClient.deleteAccount(deleteAccounDto);
+
+        return new SuccessMessage<>("删除成功").getMessage();
+    }
+
+    /**
      * 更新用户信息
      */
     @ResponseBody
@@ -267,8 +300,6 @@ public class ConsumerController {
         String id = req.getParameter("id").trim();
         String username = req.getParameter("username").trim();
         String sex = req.getParameter("sex").trim();
-        String phone_num = req.getParameter("phone_num").trim();
-        String email = req.getParameter("email").trim();
         String birth = req.getParameter("birth").trim();
         String introduction = req.getParameter("introduction").trim();
         String location = req.getParameter("location").trim();
@@ -277,16 +308,6 @@ public class ConsumerController {
         UpdateUserReqDto updateDto = new UpdateUserReqDto();
         updateDto.setUserId(id);
         updateDto.setUsername(username);
-        if ("".equals(phone_num)) {
-            updateDto.setPhone(null);
-        } else {
-            updateDto.setPhone(phone_num);
-        }
-        if ("".equals(email)) {
-            updateDto.setEmail(null);
-        } else {
-            updateDto.setEmail(email);
-        }
         updateDto.setBirthdate(birth);
         updateDto.setProfile(introduction);
         updateDto.setAddress(location);
@@ -311,9 +332,9 @@ public class ConsumerController {
      */
     @ResponseBody
     @RequestMapping(value = "/user/updatePassword", method = RequestMethod.POST)
-    public Object updatePassword(HttpServletRequest req,@CookieValue("accessToken") String accessToken) {
+    public Object updatePassword(HttpServletRequest req,@CookieValue("userAccessToken") String accessToken) {
         // 配置 accessToken
-        authenticationClient.getOptions().setAccessToken(accessToken);
+        authenticationClient.setAccessToken(accessToken);
 //        String id = req.getParameter("id").trim();
 //        String username = req.getParameter("username").trim();
         String old_password = req.getParameter("old_password").trim();
@@ -322,11 +343,12 @@ public class ConsumerController {
         UpdatePasswordDto updatePasswordDto = new UpdatePasswordDto();
         updatePasswordDto.setOldPassword(old_password);
         updatePasswordDto.setNewPassword(password);
+        updatePasswordDto.setPasswordEncryptType(UpdatePasswordDto.PasswordEncryptType.NONE);
         CommonResponseDto commonResponseDto = authenticationClient.updatePassword(updatePasswordDto);
         if (commonResponseDto.getStatusCode() == 200) {
             return new SuccessMessage<Null>("密码修改成功").getMessage();
         } else {
-            return new ErrorMessage("密码修改失败").getMessage();
+            return new ErrorMessage(commonResponseDto.getMessage()).getMessage();
         }
     }
 
@@ -374,7 +396,7 @@ public class ConsumerController {
         }
         // 获取全部用户角色
         ListRolesDto listRolesDto = new ListRolesDto();
-        listRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        listRolesDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口
         RolePaginatedRespDto rolePaginatedRespDto = managementClient.listRoles(listRolesDto);
         List<RoleDto> roleDtoList = rolePaginatedRespDto.getData().getList();
@@ -388,7 +410,7 @@ public class ConsumerController {
         for(RoleDto roleDto:roleDtoList){
             RevokeRoleDto revokeRoleDto = new RevokeRoleDto();
             revokeRoleDto.setTargets(target);
-            revokeRoleDto.setNamespace(authenticationClient.getOptions().getAppId());
+            revokeRoleDto.setNamespace(AUTHING_APP_ID);
             // code 不同
             revokeRoleDto.setCode(roleDto.getCode());
             // 调用 authing 接口
@@ -401,7 +423,7 @@ public class ConsumerController {
         for(String code:codeList){
             AssignRoleDto assignRoleDto = new AssignRoleDto();
             assignRoleDto.setTargets(target);
-            assignRoleDto.setNamespace(authenticationClient.getOptions().getAppId());
+            assignRoleDto.setNamespace(AUTHING_APP_ID);
             assignRoleDto.setCode(code);
             // 调用 authing 接口
             IsSuccessRespDto isSuccessRespDto = managementClient.assignRole(assignRoleDto);
@@ -416,7 +438,7 @@ public class ConsumerController {
      * 通过 accessToken 获取用户角色
      */
     @PostMapping("user/selectRoles")
-    public Object selectRolesByAccessToken(@CookieValue("accessToken") String accessToken){
+    public Object selectRolesByAccessToken(@CookieValue("manageAccessToken") String accessToken){
         if(StrUtil.isBlank(accessToken)){
             return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
         }
@@ -429,9 +451,9 @@ public class ConsumerController {
         String userId = userSingleRespDto.getData().getUserId();
         // 获取用户角色信息
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         getUserRolesDto.setUserId(userId);
-        getUserRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        getUserRolesDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口 (获取用户的角色列表并返回)
         RolePaginatedRespDto userRoles = managementClient.getUserRoles(getUserRolesDto);
         if(userRoles.getStatusCode() != 200){
@@ -446,7 +468,7 @@ public class ConsumerController {
      * 登出
      */
     @PostMapping("user/logout")
-    public Object logout(@CookieValue("accessToken") String accessToken){
+    public Object logout(@CookieValue("userAccessToken") String accessToken){
         Boolean flag = authenticationClient.revokeToken(accessToken);
         if(flag){
             return new SuccessMessage<>("退出登录").getMessage();

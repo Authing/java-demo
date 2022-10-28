@@ -19,8 +19,6 @@
           <div>{{ changeSex(scope.row.sex) }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="手机号码" prop="phoneNum" width="120" align="center"></el-table-column>
-      <el-table-column label="邮箱" prop="email" width="120" align="center"></el-table-column>
       <el-table-column label="生日" width="120" align="center">
         <template v-slot="scope">
           <div>{{ getBirth(scope.row.birth) }}</div>
@@ -41,13 +39,13 @@
       </el-table-column>
     </el-table>
     <el-pagination
-      class="pagination"
-      background
-      layout="total, prev, pager, next"
-      :current-page="currentPage"
-      :page-size="pageSize"
-      :total="tableData.length"
-      @current-change="handleCurrentChange"
+        class="pagination"
+        background
+        layout="total, prev, pager, next"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        :total="tableData.length"
+        @current-change="handleCurrentChange"
     >
     </el-pagination>
   </div>
@@ -57,24 +55,24 @@
 
   <!-- 修改角色提示框 -->
   <el-dialog title="修改角色" v-model="roleVisible" @close="roleVisible = false" width="300px" center>
-      <el-form label-width="60px" :model="roleEditForm" :rules="roleRule">
-        <el-form-item prop="roleCodes">
-          <el-select v-model="roleEditForm.roleCodes" multiple placeholder="请选择角色">
-            <el-option
-                v-for="item in roleEditForm.roleOptions"
-                :key="item.code"
-                :label="item.code"
-                :value="item.code"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
+    <el-form label-width="60px" :model="roleEditForm" :rules="roleRule">
+      <el-form-item prop="roleCodes">
+        <el-select v-model="roleEditForm.roleCodes" multiple placeholder="请选择角色">
+          <el-option
+              v-for="item in roleEditForm.roleOptions"
+              :key="item.code"
+              :label="item.code"
+              :value="item.code"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
             <span class="dialog-footer">
                 <el-button @click="roleVisible = false">取 消</el-button>
                 <el-button type="primary" @click="saveRoleEdit">确 定</el-button>
             </span>
-        </template>
+    </template>
   </el-dialog>
 
 </template>

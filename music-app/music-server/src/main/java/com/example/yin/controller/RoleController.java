@@ -22,6 +22,9 @@ public class RoleController {
     @Autowired
     ManagementClient managementClient;
 
+    @Value("${authing.config.appId}")
+    String AUTHING_APP_ID;
+
     /**
      * 获取全部角色
      */
@@ -29,7 +32,7 @@ public class RoleController {
     public Object getAll(){
         ListRolesDto listRolesDto = new ListRolesDto();
         // 与 namespace 对应应用绑定
-        listRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        listRolesDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口
         RolePaginatedRespDto rolePaginatedRespDto = managementClient.listRoles(listRolesDto);
         // 获取返回结果中的数据
@@ -49,7 +52,7 @@ public class RoleController {
     public Object getAllRoleWithOutSuperAdmin(){
         ListRolesDto listRolesDto = new ListRolesDto();
         // 与 namespace 对应应用绑定
-        listRolesDto.setNamespace(authenticationClient.getOptions().getAppId());
+        listRolesDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口
         RolePaginatedRespDto rolePaginatedRespDto = managementClient.listRoles(listRolesDto);
         // 获取返回结果中的数据
@@ -80,7 +83,7 @@ public class RoleController {
         CreateRoleDto createRoleDto = new CreateRoleDto();
         createRoleDto.setCode(code);
         createRoleDto.setDescription(description);
-        createRoleDto.setNamespace(authenticationClient.getOptions().getAppId());
+        createRoleDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口
         RoleSingleRespDto roleSingleRespDto = managementClient.createRole(createRoleDto);
         if(roleSingleRespDto.getStatusCode() == 200){
@@ -95,20 +98,39 @@ public class RoleController {
      */
     @GetMapping("role/delete")
     public Object deleteRole(HttpServletRequest req){
-        String code = req.getParameter("code");
+        String code = req.getParameter("code").trim();
 
         DeleteRoleDto deleteRoleDto = new DeleteRoleDto();
         // 支持批量删除
         List<String> codeList = new ArrayList<>();
         codeList.add(code);
         deleteRoleDto.setCodeList(codeList);
-        deleteRoleDto.setNamespace(authenticationClient.getOptions().getAppId());
+        deleteRoleDto.setNamespace(AUTHING_APP_ID);
         // 调用 authing 接口
         IsSuccessRespDto isSuccessRespDto = managementClient.deleteRolesBatch(deleteRoleDto);
         if(isSuccessRespDto.getStatusCode() == 200){
             return new SuccessMessage<>("删除成功").getMessage();
         }else {
             return new ErrorMessage(isSuccessRespDto.getMessage()).getMessage();
+        }
+    }
+
+    @PostMapping("/role/edit")
+    public Object editRole(HttpServletRequest req){
+        String code = req.getParameter("code").trim();
+        String newCode = req.getParameter("newCode").trim();
+        String description = req.getParameter("description").trim();
+
+        UpdateRoleDto updateRoleDto = new UpdateRoleDto();
+        updateRoleDto.setCode(code);
+        updateRoleDto.setNewCode(newCode);
+        updateRoleDto.setDescription(description);
+        updateRoleDto.setNamespace(AUTHING_APP_ID);
+        IsSuccessRespDto isSuccessRespDto = managementClient.updateRole(updateRoleDto);
+        if(isSuccessRespDto.getStatusCode() == 200){
+            return new SuccessMessage<>("修改成功").getMessage();
+        }else{
+            return new ErrorMessage("修改失败").getMessage();
         }
     }
 

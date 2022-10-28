@@ -6,7 +6,7 @@ import store from "./store";
 import "element-plus/dist/index.css";
 import "./assets/css/index.scss";
 import "./assets/icons/index.js";
-
+import VueCookies from 'vue-cookies'
 import { ComponentCustomProperties } from "vue";
 import { Store } from "vuex";
 declare module "@vue/runtime-core" {
@@ -19,4 +19,6 @@ declare module "@vue/runtime-core" {
   }
 }
 
-createApp(App).use(store).use(router).use(ElementPlus).mount("#app");
+const app = createApp(App);
+app.config.globalProperties.$cookies = VueCookies;
+app.use(store).use(router).use(ElementPlus).mount("#app");
