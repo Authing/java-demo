@@ -21,12 +21,6 @@
         <el-option v-for="item in AREA" :key="item.value" :label="item.label" :value="item.value"> </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item prop="phoneNum" label="手机">
-      <el-input placeholder="手机" v-model="registerForm.phoneNum"></el-input>
-    </el-form-item>
-    <el-form-item prop="email" label="邮箱">
-      <el-input v-model="registerForm.email" placeholder="邮箱"></el-input>
-    </el-form-item>
     <el-form-item>
       <el-button @click="goBack(-1)">取消</el-button>
       <el-button type="primary" @click="saveMsg()">保存</el-button>
@@ -52,8 +46,6 @@ export default defineComponent({
     const registerForm = reactive({
       username: "",
       sex: "",
-      phoneNum: "",
-      email: "",
       birth: new Date(),
       introduction: "",
       location: "",
@@ -65,8 +57,6 @@ export default defineComponent({
       const result = (await HttpManager.getUserOfId(id)) as ResponseBody;
       registerForm.username = result.data[0].username;
       registerForm.sex = result.data[0].sex;
-      registerForm.phoneNum = result.data[0].phoneNum;
-      registerForm.email = result.data[0].email;
       registerForm.birth = result.data[0].birth;
       registerForm.introduction = result.data[0].introduction;
       registerForm.location = result.data[0].location;
@@ -84,8 +74,6 @@ export default defineComponent({
       params.append("id", userId.value);
       params.append("username", registerForm.username);
       params.append("sex", registerForm.sex);
-      params.append("phone_num", registerForm.phoneNum);
-      params.append("email", registerForm.email);
       params.append("birth", getBirth(registerForm.birth));
       params.append("introduction", registerForm.introduction);
       params.append("location", registerForm.location);

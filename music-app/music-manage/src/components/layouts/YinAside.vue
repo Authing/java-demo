@@ -16,7 +16,7 @@
         <el-icon><User /></el-icon>
         <span>用户管理</span>
       </el-menu-item>
-      <el-menu-item index="Role" v-if="menuList[8].meta.visiable">
+      <el-menu-item index="Role" v-if="isSuperAdminFlag">
         <el-icon><User /></el-icon>
         <span>角色管理</span>
       </el-menu-item>
@@ -33,53 +33,25 @@
 </template>
 
 <script lang="ts" setup>
-import { ref,defineComponent } from "vue";
+import { ref,getCurrentInstance } from "vue";
 import { PieChart, Mic, Document, User } from "@element-plus/icons-vue";
 import emitter from "@/utils/emitter";
 import routes from "@/router/index";
 import { HttpManager } from "@/api/index";
 
-// export default defineComponent({
-//   setup(){
-    const menuList = routes.options.routes[0].children;
-    getUserRoles();
-    async function getUserRoles() {
-      const result = (await HttpManager.selectRoles()) as ResponseBody;
-      if(result.success){
-        let userRoles = result.data;
-        console.log("userRoles:",userRoles);
-        menuList.forEach(element => {
-          // 1- for 循环一级菜单
-          // 2-找出角色 所在的 角色数组(判断某个值在不在 数组中)
-          // 3- 然后 所在的数组 visiable 改为true ，其他的改为false
-          if (element.meta.roles){
-            // let roleArray = JSON.parse(userRoles);
-            if(userRoles){
-              userRoles.forEach(role => {
-              if(Object.values(element.meta.roles).includes(role)){
-                element.meta.visiable = true;
-              }else{
-                element.meta.visiable = false;
-              }
-            })
-            }
-          }
-        });
-      }
+    const isSuperAdminFlag = ref(false);
+    let internalInstance = getCurrentInstance();
+    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    if(cookies.get("isSuperAdmin") === "true"){
+      isSuperAdminFlag.value = true;
     }
+  
   
     const collapse = ref(false);
     emitter.on("collapse", (msg) => {
       collapse.value = msg as boolean;
     });
 
-    // return{
-    //   collapse,
-    //   menuList,
-    //   getUserRoles,
-    // };
-//   }
-// })
 </script>
 
 <style scoped>

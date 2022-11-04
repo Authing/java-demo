@@ -49,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/Role',
         component: () => import('@/views/RolePage.vue'),
-        meta: { title: 'Role',visiable: false,roles: ["superAdmin"]}
+        meta: { title: 'Role' }
       }
     ]
   },

@@ -39,6 +39,10 @@ export default defineComponent({
     YinHeaderNav,
   },
   setup() {
+
+    let internalInstance = getCurrentInstance();
+    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+
     const { proxy } = getCurrentInstance();
     const store = useStore();
     const { changeIndex, routerManager } = mixin();
@@ -73,6 +77,9 @@ export default defineComponent({
           message: result.message,
           type: result.type,
         });
+        if(cookies.isKey("userAccessToken")){
+          cookies.remove("userAccessToken");
+        }
         changeIndex(NavName.Home);
         routerManager(RouterName.Home, { path: RouterName.Home });
       } else {

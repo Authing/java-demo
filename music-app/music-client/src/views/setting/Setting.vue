@@ -9,7 +9,14 @@
         <Password></Password>
       </el-tab-pane>
       <el-tab-pane label="账号和安全" class="content">
-        <el-button type="danger" :icon="Delete" @click="cancelAccount">注销账号</el-button>
+        <el-form ref="passwordForm" label-width="70px" :model="form" :rules="rules">
+          <el-form-item label="密码" prop="password">
+            <el-input type="password" v-model="form.password" />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="danger" :icon="Delete" @click="cancelAccount">注销账号</el-button>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -24,6 +31,7 @@ import { HttpManager } from "@/api";
 import { useStore } from "vuex";
 import mixin from "@/mixins/mixin";
 import { RouterName } from "@/enums";
+import { validatePassword } from "@/enums";
 
 export default defineComponent({
   components: {
@@ -36,18 +44,39 @@ export default defineComponent({
     const { routerManager } = mixin();
 
     const userId = computed(() => store.getters.userId);
+    const form = reactive({
+      password:""
+    });
+
+    const rules = reactive({
+      password: [{ validator: validatePassword, trigger: "blur", min: 3 }],
+    });
 
     async function cancelAccount() {
-      const result = (await HttpManager.deleteUser(userId.value)) as ResponseBody;
+      let canRun = true;
+      (proxy.$refs["passwordForm"] as any).validate((valid) => {
+        if (!valid) return (canRun = false);
+      });
+      if (!canRun) return;
+
+      const params = new URLSearchParams();
+      params.append("id", userId.value);
+      params.append("password", form.password);
+
+      const result = (await HttpManager.deleteUser(params)) as ResponseBody;
       (proxy as any).$message({
         message: result.message,
         type: result.type,
       });
-      routerManager(RouterName.SignIn, { path: RouterName.SignIn });
-      proxy.$store.commit("setToken", false);
+      if(result.success){
+        routerManager(RouterName.SignIn, { path: RouterName.SignIn });
+        proxy.$store.commit("setToken", false);
+      }
     }
 
     return {
+      form,
+      rules,
       Delete,
       cancelAccount,
     };

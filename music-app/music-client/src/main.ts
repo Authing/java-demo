@@ -9,6 +9,7 @@ import "./assets/icons/index.js";
 import VueCookies from 'vue-cookies'
 import { ComponentCustomProperties } from "vue";
 import { Store } from "vuex";
+import { AuthenticationClient } from "authing-js-sdk";
 declare module "@vue/runtime-core" {
   interface State {
     count: number;
@@ -22,3 +23,4 @@ declare module "@vue/runtime-core" {
 const app = createApp(App);
 app.config.globalProperties.$cookies = VueCookies;
 app.use(store).use(router).use(ElementPlus).mount("#app");
+

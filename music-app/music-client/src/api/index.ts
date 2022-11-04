@@ -11,7 +11,7 @@ const HttpManager = {
   // 注册
   SignUp: (params) => post(`user/add`, params),
   // 删除用户
-  deleteUser: (id) => get(`user/delete?id=${id}`),
+  deleteUser: (params) => post(`user/deleteSelf`,params),
   // 更新用户信息
   updateUserMsg: (params) => post(`user/update`, params),
   updateUserPassword: (params) => post(`user/updatePassword`, params),

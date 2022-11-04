@@ -26,7 +26,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, onMounted } from "vue";
+import { defineComponent, computed, ref, onMounted, getCurrentInstance } from "vue";
 import { useStore } from "vuex";
 import mixin from "@/mixins/mixin";
 import { Expand, Fold } from "@element-plus/icons-vue";
@@ -40,6 +40,9 @@ export default defineComponent({
     Fold,
   },
   setup() {
+    let internalInstance = getCurrentInstance();
+    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+
     const { routerManager } = mixin();
     const store = useStore();
 
@@ -63,6 +66,12 @@ export default defineComponent({
     async function handleCommand(command) {
       if (command === "loginout") {
         const result = (await HttpManager.logout()) as ResponseBody;
+        if(cookies.isKey("manageAccessToken")){
+          cookies.remove("manageAccessToken");
+        }
+        if(cookies.isKey("isSuperAdmin")){
+          cookies.remove("isSuperAdmin");
+        }
         routerManager(RouterName.SignIn, { path: RouterName.SignIn });
       }
     }
