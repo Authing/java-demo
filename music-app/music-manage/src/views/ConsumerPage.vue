@@ -7,7 +7,7 @@
 
     <el-table height="550px" border size="small" :data="data" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="40" align="center"></el-table-column>
-      <el-table-column label="ID" prop="id" width="50" align="center"></el-table-column>
+      <el-table-column label="ID" prop="id" width="200" align="center"></el-table-column>
       <el-table-column label="用户头像" width="102" align="center">
         <template v-slot="scope">
           <img :src="attachImageUrl(scope.row.avator)" style="width: 80px" />
