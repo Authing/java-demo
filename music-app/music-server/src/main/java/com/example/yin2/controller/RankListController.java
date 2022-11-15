@@ -1,5 +1,8 @@
 package com.example.yin2.controller;
 
+import cn.authing.sdk.java.client.AuthenticationClient;
+import cn.authing.sdk.java.dto.authentication.UserInfo;
+import cn.hutool.core.util.StrUtil;
 import com.example.yin2.common.ErrorMessage;
 import com.example.yin2.common.SuccessMessage;
 import com.example.yin2.domain.RankList;
@@ -7,10 +10,7 @@ import com.example.yin2.service.impl.RankListServiceImpl;
 
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +19,9 @@ public class RankListController {
 
     @Autowired
     private RankListServiceImpl rankListService;
+
+    @Autowired
+    private AuthenticationClient authenticationClient;
 
     // 提交评分
     @ResponseBody
@@ -51,10 +54,16 @@ public class RankListController {
     
     // 获取指定用户的歌单评分
     @RequestMapping(value = "/rankList/user", method = RequestMethod.GET)
-    public Object getUserRank(HttpServletRequest req) {
-        String consumerId = req.getParameter("consumerId");
+    public Object getUserRank(HttpServletRequest req, @CookieValue(value = "userAccessToken",required = false) String accessToken) {
+        if(StrUtil.isBlank(accessToken)){
+            return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
+        }
+        //        String consumerId = req.getParameter("consumerId");
         String songListId = req.getParameter("songListId");
-        
-        return new SuccessMessage<Number>(null, rankListService.getUserRank(Long.parseLong(consumerId), Long.parseLong(songListId))).getMessage();
+
+        UserInfo userInfo = authenticationClient.getUserInfoByAccessToken(accessToken);
+        String authingUserId = userInfo.getSub();
+
+        return new SuccessMessage<Number>(null, rankListService.getUserRank(authingUserId, Long.parseLong(songListId))).getMessage();
     }
 }

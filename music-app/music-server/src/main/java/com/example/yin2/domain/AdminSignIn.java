@@ -1,14 +1,14 @@
-package com.example.yin2.controller;
+package com.example.yin2.domain;
 
-public class AdminSignInDto {
+public class AdminSignIn {
     private String accessToken;
 
     private boolean isSuperAdmin;
 
-    public AdminSignInDto() {
+    public AdminSignIn() {
     }
 
-    public AdminSignInDto(String accessToken, boolean isSuperAdmin) {
+    public AdminSignIn(String accessToken, boolean isSuperAdmin) {
         this.accessToken = accessToken;
         this.isSuperAdmin = isSuperAdmin;
     }

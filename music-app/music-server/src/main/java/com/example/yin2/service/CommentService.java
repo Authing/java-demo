@@ -10,7 +10,7 @@ public interface CommentService {
 
     boolean updateCommentMsg(Comment comment);
 
-    boolean deleteComment(Integer id);
+    boolean deleteComment(String id);
 
     List<Comment> commentOfSongId(Integer songId);
 

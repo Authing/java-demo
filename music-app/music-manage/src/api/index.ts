@@ -22,8 +22,8 @@ const HttpManager = {
   deleteUser: (id) => get(`user/delete?id=${id}`),
   // 改变用户角色
   changeRole: (params) => post(`user/changeRole`,params),
-  // 获取用户角色
-  selectRoles: () => post(`user/selectRoles`),
+  // // 获取用户角色
+  // selectRoles: () => post(`user/selectRoles`),
 
   // =======================> 角色 API
   // 查询所有角色

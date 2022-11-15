@@ -25,7 +25,7 @@ public class CommentServiceImpl implements CommentService{
 
 //    删除评论
     @Override
-    public boolean deleteComment(Integer id) {
+    public boolean deleteComment(String id) {
         return commentMapper.deleteComment(id) >0 ?true:false;
     }
 

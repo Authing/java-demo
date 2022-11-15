@@ -1,5 +1,8 @@
 package com.example.yin2.controller;
 
+import cn.authing.sdk.java.client.AuthenticationClient;
+import cn.authing.sdk.java.dto.authentication.UserInfo;
+import cn.hutool.core.util.StrUtil;
 import com.example.yin2.common.ErrorMessage;
 import com.example.yin2.common.SuccessMessage;
 import com.example.yin2.domain.Comment;
@@ -7,10 +10,7 @@ import com.example.yin2.service.impl.CommentServiceImpl;
 
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -21,18 +21,29 @@ public class CommentController {
     @Autowired
     private CommentServiceImpl commentService;
 
+    @Autowired
+    private AuthenticationClient authenticationClient;
+
     // 提交评论
     @ResponseBody
     @RequestMapping(value = "/comment/add", method = RequestMethod.POST)
-    public Object addComment(HttpServletRequest req) {
-        String user_id = req.getParameter("userId");
+    public Object addComment(HttpServletRequest req,@CookieValue(value = "userAccessToken",required = false) String accessToken) {
+        if(StrUtil.isBlank(accessToken)){
+            return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
+        }
+
+        UserInfo userInfo = authenticationClient.getUserInfoByAccessToken(accessToken);
+        String authingUserId = userInfo.getSub();
+
+//        String user_id = req.getParameter("userId");
         String type = req.getParameter("type");
         String song_list_id = req.getParameter("songListId");
         String song_id = req.getParameter("songId");
         String content = req.getParameter("content").trim();
 
         Comment comment = new Comment();
-        comment.setUserId(Integer.parseInt(user_id));
+//        comment.setUserId(Integer.parseInt(user_id));
+        comment.setOwnerId(authingUserId);
         comment.setType(new Byte(type));
         if (new Byte(type) == 0) {
             comment.setSongId(Integer.parseInt(song_id));
@@ -54,7 +65,7 @@ public class CommentController {
     public Object deleteComment(HttpServletRequest req) {
         String id = req.getParameter("id");
 
-        boolean res = commentService.deleteComment(Integer.parseInt(id));
+        boolean res = commentService.deleteComment(id);
         if (res) {
             return new SuccessMessage<Null>("删除成功").getMessage();
         } else {

@@ -10,6 +10,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="type" property="type" jdbcType="TINYINT" />
     <result column="up" property="up" jdbcType="INTEGER" />
+    <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, song_id, song_list_id, content, create_time, type, up
@@ -29,9 +30,9 @@
     from comment
     where song_list_id = #{songListId, jdbcType=INTEGER}
   </select>
-  <delete id="deleteComment" parameterType="java.lang.Integer">
+  <delete id="deleteComment" parameterType="java.lang.String">
     delete from comment
-    where id = #{id, jdbcType=INTEGER}
+    where id = #{id, jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.example.yin2.domain.Comment">
     insert into comment (id, user_id, song_id, song_list_id, content, create_time, type, up)
@@ -64,6 +65,9 @@
       <if test="up != null">
         up,
       </if>
+      <if test="ownerId != null">
+        owner_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null"> #{id,jdbcType=INTEGER},
@@ -81,6 +85,8 @@
       <if test="type != null"> #{type,jdbcType=TINYINT},
       </if>
       <if test="up != null"> #{up,jdbcType=INTEGER},
+      </if>
+      <if test="ownerId != null"> #{ownerId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -107,6 +113,9 @@
       </if>
       <if test="up != null">
         up = #{up,jdbcType=INTEGER},
+      </if>
+      <if test="ownerId != null">
+        owner_id = #{ownerId,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}

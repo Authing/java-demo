@@ -8,9 +8,9 @@ public interface CollectService {
 
     boolean addCollection(Collect collect);
 
-    boolean existSongId(Integer userId, Integer songId);
+    boolean existSongId(String authingUserId, Integer songId);
 
-    boolean deleteCollect(Integer userId, Integer songId);
+    boolean deleteCollect(String authingUserId, Integer songId);
 
-    List<Collect> collectionOfUser(Integer userId);
+    List<Collect> collectionOfUser(String authingUserId);
 }

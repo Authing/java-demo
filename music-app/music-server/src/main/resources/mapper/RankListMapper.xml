@@ -6,6 +6,7 @@
     <result column="songListId" property="songListId" jdbcType="BIGINT" />
     <result column="consumerId" property="consumerId" jdbcType="BIGINT" />
     <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
   </resultMap>
 
   <select id="selectScoreSum" resultType="java.lang.Integer">
@@ -14,10 +15,10 @@
   <select id="selectRankNum" resultType="java.lang.Integer">
   SELECT COALESCE(count(id),0) as num from rank_list where songListId = #{0} ;
   </select>
-  <select id="selectUserRank" resultType="java.lang.Integer" parameterType="com.example.yin2.domain.RankList">
+  <select id="selectUserRank" resultType="java.lang.Integer">
     select score
     from rank_list
-    where consumerId = #{consumerId, jdbcType=BIGINT} and songListId = #{songListId, jdbcType=INTEGER}
+    where owner_id = #{authingUserId, jdbcType=VARCHAR} and songListId = #{songListId, jdbcType=INTEGER}
   </select>
 
   <insert id="insert" parameterType="com.example.yin2.domain.RankList">

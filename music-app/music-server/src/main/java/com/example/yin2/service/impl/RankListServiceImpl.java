@@ -32,7 +32,7 @@ public class RankListServiceImpl implements RankListService {
     }
 
     @Override
-    public int getUserRank(Long consumerId, Long songListId) {
-        return rankMapper.selectUserRank(consumerId, songListId);
+    public int getUserRank(String authingUserId, Long songListId) {
+        return rankMapper.selectUserRank(authingUserId, songListId);
     }
 }

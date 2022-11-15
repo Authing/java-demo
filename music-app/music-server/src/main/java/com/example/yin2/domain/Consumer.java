@@ -32,6 +32,8 @@ public class Consumer {
 
     private List<String> roleCodes;
 
+    private String ownerId;
+
     public String getId() {
         return id;
     }
@@ -134,6 +136,14 @@ public class Consumer {
 
     public void setRoleCodes(List<String> roleCodes) {
         this.roleCodes = roleCodes;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override

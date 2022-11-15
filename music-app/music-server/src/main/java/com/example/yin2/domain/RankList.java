@@ -12,6 +12,8 @@ public class RankList implements Serializable {
 
     private Integer score;
 
+    private String ownerId;
+
     public Long getId() {
         return id;
     }
@@ -42,5 +44,13 @@ public class RankList implements Serializable {
 
     public void setScore(Integer score) {
         this.score = score;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 }

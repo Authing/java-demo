@@ -15,22 +15,39 @@
         <el-button @click="handleSignUp">注册</el-button>
         <el-button type="primary" @click="handleLoginIn">登录</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button class="login-btn" type="primary" @click="goAuthing">使用 Authing 内嵌的登录/注册功能</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="login-btn" type="primary" @click="startWithRedirect">使用 Authing 托管的登录/注册功能</el-button>
+      </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, getCurrentInstance } from "vue";
+import { defineComponent, reactive, getCurrentInstance, onMounted } from "vue";
 import mixin from "@/mixins/mixin";
 import YinLoginLogo from "@/components/layouts/YinLoginLogo.vue";
 import { HttpManager } from "@/api";
 import { NavName, RouterName, SignInRules } from "@/enums";
+import { useGuard } from "@authing/guard-vue3";
+import { useRouter } from 'vue-router';
+import type { JwtTokenStatus, User } from '@authing/guard-vue3'
 
 export default defineComponent({
   components: {
     YinLoginLogo,
   },
   setup() {
+    const guard = useGuard();
+
+    function startWithRedirect(){
+      guard.startWithRedirect({
+        state: 'some-random-string'
+      })
+    }
+
     let internalInstance = getCurrentInstance();
     let cookies = internalInstance.appContext.config.globalProperties.$cookies;
 
@@ -80,11 +97,21 @@ export default defineComponent({
       routerManager(RouterName.SignUp, { path: RouterName.SignUp });
     }
 
+    const router = useRouter()
+
+    function goAuthing(){
+      router.replace({
+        name: 'AuthingGuardEmbed'
+      })
+    }
+
     return {
       registerForm,
       SignInRules,
       handleLoginIn,
       handleSignUp,
+      goAuthing,
+      startWithRedirect,
     };
   },
 });

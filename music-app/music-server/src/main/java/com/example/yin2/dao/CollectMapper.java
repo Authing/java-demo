@@ -20,9 +20,9 @@ public interface CollectMapper {
 
     int updateByPrimaryKey(Collect record);
 
-    int existSongId(@Param("userId") Integer userId, @Param("songId") Integer songId);
+    int existSongId(@Param("authingUserId") String authingUserId, @Param("songId") Integer songId);
 
-    int deleteCollect(@Param("userId") Integer userId, @Param("songId") Integer songId);
+    int deleteCollect(@Param("authingUserId") String authingUserId, @Param("songId") Integer songId);
 
-    List<Collect> collectionOfUser(Integer userId);
+    List<Collect> collectionOfUser(String authingUserId);
 }

@@ -89,6 +89,21 @@ const routes: Array<RouteRecordRaw> = [
           }
         ]
       },
+      {
+        path: "/callback",
+        name: "Callback",
+        component: () => import("@/views/Callback.vue"),
+      },
+      {
+        path: "/authingGuardEmbed",
+        name: "AuthingGuardEmbed",
+        component: () => import("@/views/AuthingGuardEmbed.vue"),
+      },
+      {
+        path: "/logout",
+        name: "Logout",
+        component: () => import("@/views/Logout.vue"),
+      },
     ],
   },
 ];

@@ -3,16 +3,20 @@ package com.example.yin2.controller;
 import cn.authing.sdk.java.client.AuthenticationClient;
 import cn.authing.sdk.java.client.ManagementClient;
 import cn.authing.sdk.java.dto.*;
+import cn.authing.sdk.java.dto.authentication.BuildLogoutUrlParams;
+import cn.authing.sdk.java.dto.authentication.UserInfo;
+import cn.authing.sdk.java.model.AuthingRequestConfig;
+import cn.authing.sdk.java.util.JsonUtils;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.Header;
+import com.alibaba.fastjson.JSONObject;
 import com.example.yin2.Enum.RoleCodeEnum;
 import com.example.yin2.common.FatalMessage;
 import com.example.yin2.common.ErrorMessage;
 import com.example.yin2.common.SuccessMessage;
 import com.example.yin2.common.WarningMessage;
 import com.example.yin2.constant.Constants;
-import com.example.yin2.domain.Consumer;
-import com.example.yin2.domain.UserRoleParam;
-import com.example.yin2.domain.ConsumerSignInDto;
+import com.example.yin2.domain.*;
 import com.example.yin2.service.impl.ConsumerServiceImpl;
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,6 +51,12 @@ public class ConsumerController {
 
     @Value("${authing.config.appId}")
     String AUTHING_APP_ID;
+
+    @Value("${authing.config.appSecret}")
+    String AUTHING_APP_SECRET;
+
+    @Value("${authing.config.redirectUri}")
+    String AUTHING_REDIRECTURI;
 
     @Configuration
     public static class MyPicConfig implements WebMvcConfigurer {
@@ -128,7 +136,7 @@ public class ConsumerController {
      */
     @ResponseBody
     @RequestMapping(value = "/user/login/status", method = RequestMethod.POST)
-    public Object loginStatus(HttpServletRequest req, HttpSession session) {
+    public Object loginStatus(HttpServletRequest req) {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         //  调用 authing 接口 (通过用户名和密码登入)
@@ -142,12 +150,11 @@ public class ConsumerController {
         list.add(userDto);
         listUsersRequestDto.setAdvancedFilter(list);
         if (loginTokenRespDto.getStatusCode() == 200) {
-            session.setAttribute("username", username);
+            String accessToken = loginTokenRespDto.getData().getAccessToken();
+            List<Consumer> consumers = convertConsumers(managementClient.listUsers(listUsersRequestDto).getData().getList());
             //  调用 authing 接口 (登入成功后需要返回所有用户列表)
-            return new SuccessMessage<ConsumerSignInDto>("登录成功",
-                    new ConsumerSignInDto(loginTokenRespDto.getData().getAccessToken(),
-                            convertConsumers(managementClient.listUsers(listUsersRequestDto).getData().getList()
-                            ))).getMessage();
+            return new SuccessMessage<ConsumerSignIn>("登录成功",
+                    new ConsumerSignIn(accessToken,consumers)).getMessage();
         } else {
             return new ErrorMessage(loginTokenRespDto.getMessage()).getMessage();
         }
@@ -196,6 +203,7 @@ public class ConsumerController {
     private Consumer convertConsumer(UserDto item) {
         Consumer consumer = new Consumer();
         consumer.setId(item.getUserId());
+        consumer.setOwnerId(item.getUserId());
         consumer.setUsername(item.getUsername());
         if (SignUpProfileDto.Gender.F.getValue().equals(item.getGender().getValue())) {
             consumer.setSex(new Byte("0"));
@@ -241,8 +249,13 @@ public class ConsumerController {
         GetUserDto getUserDto = new GetUserDto();
         getUserDto.setUserId(id);
         //  调用 authing 接口 (根据 userId 获取用户信息)
-        UserSingleRespDto user = managementClient.getUser(getUserDto);
-        return new SuccessMessage<List<Consumer>>(null, convertConsumers(Collections.singletonList(user.getData()))).getMessage();
+        UserSingleRespDto userSingleRespDto = managementClient.getUser(getUserDto);
+        if(userSingleRespDto.getStatusCode() == 200) {
+            return new SuccessMessage<List<Consumer>>(null,
+                    convertConsumers(Collections.singletonList(userSingleRespDto.getData()))).getMessage();
+        }else {
+            return new ErrorMessage("获取用户信息失败").getMessage();
+        }
     }
 
     /**
@@ -266,10 +279,14 @@ public class ConsumerController {
      * 用户自我注销账号
      */
     @RequestMapping(value = "/user/deleteSelf", method = RequestMethod.POST)
-    public Object deleteUserBySelf(HttpServletRequest req,@CookieValue("userAccessToken") String accessToken) {
+    public Object deleteUserBySelf(HttpServletRequest req,@CookieValue(value = "userAccessToken",required = false) String accessToken) {
 //        String id = req.getParameter("id");
-        String password = req.getParameter("password");
+        if(StrUtil.isBlank(accessToken)) {
+            return new ErrorMessage("accessToken失效，请重新登录").getMessage();
+        }
+
         authenticationClient.setAccessToken(accessToken);
+        String password = req.getParameter("password");
 
         VerifyDeleteAccountRequestDto verifyDeleteAccountRequestDto = new VerifyDeleteAccountRequestDto();
         verifyDeleteAccountRequestDto.setVerifyMethod(VerifyDeleteAccountRequestDto.VerifyMethod.PASSWORD);
@@ -332,7 +349,10 @@ public class ConsumerController {
      */
     @ResponseBody
     @RequestMapping(value = "/user/updatePassword", method = RequestMethod.POST)
-    public Object updatePassword(HttpServletRequest req,@CookieValue("userAccessToken") String accessToken) {
+    public Object updatePassword(HttpServletRequest req,@CookieValue(value = "userAccessToken",required = false) String accessToken) {
+        if(StrUtil.isBlank(accessToken)) {
+            return new ErrorMessage("accessToken失效，请重新登录").getMessage();
+        }
         // 配置 accessToken
         authenticationClient.setAccessToken(accessToken);
 //        String id = req.getParameter("id").trim();
@@ -435,48 +455,44 @@ public class ConsumerController {
     }
 
     /**
-     * 通过 accessToken 获取用户角色
-     */
-    @PostMapping("user/selectRoles")
-    public Object selectRolesByAccessToken(@CookieValue("manageAccessToken") String accessToken){
-        if(StrUtil.isBlank(accessToken)){
-            return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
-        }
-        authenticationClient.setAccessToken(accessToken);
-        // 获取用户信息
-        UserSingleRespDto userSingleRespDto = authenticationClient.getProfile(new GetProfileDto());
-        if(userSingleRespDto.getStatusCode() != 200){
-            return new ErrorMessage("获取用户信息失败").getMessage();
-        }
-        String userId = userSingleRespDto.getData().getUserId();
-        // 获取用户角色信息
-        GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
-        getUserRolesDto.setNamespace(AUTHING_APP_ID);
-        getUserRolesDto.setUserId(userId);
-        getUserRolesDto.setNamespace(AUTHING_APP_ID);
-        // 调用 authing 接口 (获取用户的角色列表并返回)
-        RolePaginatedRespDto userRoles = managementClient.getUserRoles(getUserRolesDto);
-        if(userRoles.getStatusCode() != 200){
-            return new ErrorMessage("获取用户角色列表失败").getMessage();
-        }
-        List<RoleDto> roles = userRoles.getData().getList();
-        List<String> codes = roles.stream().map(RoleDto::getCode).collect(Collectors.toList());
-        return new SuccessMessage<List<String>>("获取用户角色成功",codes).getMessage();
-    }
-
-    /**
      * 登出
      */
     @PostMapping("user/logout")
-    public Object logout(@CookieValue("userAccessToken") String accessToken,HttpSession session){
-        //销毁 session
-        session.invalidate();
+    public Object logout(@CookieValue(value = "userAccessToken",required = false) String accessToken) throws Exception {
+        if(StrUtil.isBlank(accessToken)) {
+            return new ErrorMessage("accessToken失效，请重新登录").getMessage();
+        }
         Boolean flag = authenticationClient.revokeToken(accessToken);
         if(flag){
             return new SuccessMessage<>("退出登录").getMessage();
         }else{
-            return new ErrorMessage("退出登录出错").getMessage();
+            return new ErrorMessage("撤销accessToken出错").getMessage();
         }
+    }
+
+    /**
+     * 用 Guard 返回的 token 换取 AccessToken
+     */
+    @PostMapping("user/getAccessTokenByToken")
+    public Object getAccessTokenByToken(HttpServletRequest req){
+        String token = req.getParameter("token").trim();
+        AuthingRequestConfig config = new AuthingRequestConfig();
+        config.setUrl("/oidc/token");
+        config.setMethod("UrlencodedPOST");
+        Map<String, String> headers = new HashMap();
+        headers.put(Header.CONTENT_TYPE.getValue(), "application/x-www-form-urlencoded");
+        config.setHeaders(headers);
+        AccessTokenReq tokenReq = new AccessTokenReq();
+        tokenReq.setToken(token);
+        tokenReq.setClientId(AUTHING_APP_ID);
+        tokenReq.setClientSecret(AUTHING_APP_SECRET);
+        tokenReq.setGrantType("http://authing.cn/oidc/grant_type/authing_token");
+        tokenReq.setScope("openid");
+        tokenReq.setRedirectUri(AUTHING_REDIRECTURI);
+        config.setBody(tokenReq);
+        String response = authenticationClient.request(config);
+        AccessTokenRes accessTokenRes = JsonUtils.deserialize(response, AccessTokenRes.class);
+        return new SuccessMessage<String>("获取 accessToken 成功",accessTokenRes.getAccessToken()).getMessage();
     }
 
 }

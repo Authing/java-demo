@@ -19,6 +19,8 @@ const HttpManager = {
   getUserOfId: (id) => get(`user/detail?id=${id}`),
   // 更新用户头像
   uploadUrl: (userId) => `${getBaseURL()}/user/avatar/update?id=${userId}`,
+  // 用 Guard Token 换 AccessToken
+  getAccessTokenByToken: (params) => post(`user/getAccessTokenByToken`,params),
 
   // =======================> 歌单 API
   // 获取全部歌单

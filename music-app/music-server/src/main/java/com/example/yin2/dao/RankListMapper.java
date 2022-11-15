@@ -27,9 +27,9 @@ public interface RankListMapper {
 
     /**
      * 查制定用户评分
-     * @param consumerId
+     * @param authingUserId
      * @param songListId
      * @return
      */
-    int selectUserRank(@Param("consumerId") Long consumerId, @Param("songListId")  Long songListId);
+    int selectUserRank(@Param("authingUserId") String authingUserId, @Param("songListId")  Long songListId);
 }

@@ -4,9 +4,11 @@ import cn.authing.sdk.java.client.AuthenticationClient;
 import cn.authing.sdk.java.client.ManagementClient;
 import cn.authing.sdk.java.dto.*;
 import cn.authing.sdk.java.dto.authentication.UserInfo;
+import cn.hutool.core.util.StrUtil;
 import com.example.yin2.Enum.RoleCodeEnum;
 import com.example.yin2.common.ErrorMessage;
 import com.example.yin2.common.SuccessMessage;
+import com.example.yin2.domain.AdminSignIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +72,7 @@ public class AdminController {
         if (loginTokenRespDto.getStatusCode() == 200) {
             if(isAdmin){
                 // 只有请求成功且是管理员才能登录后台系统，同时将 accessToken 返回到前端
-                return new SuccessMessage<AdminSignInDto>("登录成功",new AdminSignInDto(loginTokenRespDto.getData().getAccessToken(),isSuperAdminFlag)).getMessage();
+                return new SuccessMessage<AdminSignIn>("登录成功",new AdminSignIn(loginTokenRespDto.getData().getAccessToken(),isSuperAdminFlag)).getMessage();
             }else{
                 return new ErrorMessage("只有管理员才能登录后台管理系统").getMessage();
             }
@@ -84,12 +86,15 @@ public class AdminController {
      * 登出
      */
     @PostMapping("admin/logout")
-    public Object logout(@CookieValue("manageAccessToken") String accessToken){
+    public Object logout(@CookieValue(value = "manageAccessToken",required = false) String accessToken){
+        if(StrUtil.isBlank(accessToken)){
+            return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
+        }
         Boolean flag = authenticationClient.revokeToken(accessToken);
         if(flag){
             return new SuccessMessage<>("退出登录").getMessage();
         }else{
-            return new ErrorMessage("退出登录出错").getMessage();
+            return new ErrorMessage("撤销accessToken出错").getMessage();
         }
     }
 }

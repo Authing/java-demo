@@ -19,19 +19,19 @@ public class CollectServiceImpl implements CollectService {
     }
 
     @Override
-    public boolean existSongId(Integer userId, Integer songId) {
-        return collectMapper.existSongId(userId, songId) > 0 ? true : false;
+    public boolean existSongId(String authingUserId, Integer songId) {
+        return collectMapper.existSongId(authingUserId, songId) > 0 ? true : false;
     }
 
     @Override
-    public boolean deleteCollect(Integer userId, Integer songId) {
-        return collectMapper.deleteCollect(userId, songId) > 0 ? true : false;
+    public boolean deleteCollect(String authingUserId, Integer songId) {
+        return collectMapper.deleteCollect(authingUserId, songId) > 0 ? true : false;
     }
 
     @Override
-    public List<Collect> collectionOfUser(Integer userId)
+    public List<Collect> collectionOfUser(String authingUserId)
 
     {
-        return collectMapper.collectionOfUser(userId);
+        return collectMapper.collectionOfUser(authingUserId);
     }
 }

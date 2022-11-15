@@ -8,6 +8,9 @@ axios.defaults.withCredentials = true; // true允许跨域
 axios.defaults.baseURL = BASE_URL;
 // Content-Type 响应头
 axios.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+axios.defaults.headers.get["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8";
+// axios.defaults.headers.get["Access-Control-Allow-Origin"] = "*";
+// axios.defaults.headers.get["Access-Control-Allow-Headers"] = "*";
 
 // 响应拦截器
 axios.interceptors.response.use(

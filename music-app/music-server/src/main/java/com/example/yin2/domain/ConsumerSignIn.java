@@ -2,15 +2,15 @@ package com.example.yin2.domain;
 
 import java.util.List;
 
-public class ConsumerSignInDto {
+public class ConsumerSignIn {
     private String accessToken;
 
     private List<Consumer> consumerList;
 
-    public ConsumerSignInDto() {
+    public ConsumerSignIn() {
     }
 
-    public ConsumerSignInDto(String accessToken, List<Consumer> consumerList) {
+    public ConsumerSignIn(String accessToken, List<Consumer> consumerList) {
         this.accessToken = accessToken;
         this.consumerList = consumerList;
     }

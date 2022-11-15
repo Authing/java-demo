@@ -8,6 +8,7 @@
     <result column="song_id" property="songId" jdbcType="INTEGER" />
     <result column="song_list_id" property="songListId" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="owner_id" property="ownerId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List">
     id, user_id, type, song_id, song_list_id, create_time
@@ -21,17 +22,17 @@
   <select id="existSongId" resultType="java.lang.Integer">
     select count(*)
     from collect
-    where user_id = #{userId, jdbcType=INTEGER} and song_id = #{songId, jdbcType=INTEGER}
+    where owner_id = #{authingUserId, jdbcType=VARCHAR} and song_id = #{songId, jdbcType=INTEGER}
   </select>
-  <select id="collectionOfUser" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  <select id="collectionOfUser" resultMap="BaseResultMap" parameterType="java.lang.String">
     select *
     from collect
-    where user_id = #{userId, jdbcType=INTEGER}
+    where owner_id = #{authingUserId, jdbcType=VARCHAR}
   </select>
 
-  <delete id="deleteCollect" parameterType="java.lang.Integer">
+  <delete id="deleteCollect">
     delete from collect
-    where user_id = #{userId, jdbcType=INTEGER}
+    where owner_id = #{authingUserId, jdbcType=VARCHAR}
     and song_id = #{songId, jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.example.yin2.domain.Collect">
@@ -59,6 +60,9 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="ownerId != null">
+        owner_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null"> #{id,jdbcType=INTEGER},
@@ -72,6 +76,8 @@
       <if test="songListId != null"> #{songListId,jdbcType=INTEGER},
       </if>
       <if test="createTime != null"> #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ownerId != null"> #{ownerId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>

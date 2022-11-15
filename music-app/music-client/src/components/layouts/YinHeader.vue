@@ -32,6 +32,9 @@ import YinHeaderNav from "./YinHeaderNav.vue";
 import mixin from "@/mixins/mixin";
 import { HEADERNAVLIST, SIGNLIST, MENULIST, Icon, MUSICNAME, RouterName, NavName } from "@/enums";
 import { HttpManager } from "@/api";
+import axios from "axios";
+import { useGuard } from "@authing/guard-vue3";
+import type { JwtTokenStatus, User } from '@authing/guard-vue3'
 
 export default defineComponent({
   components: {
@@ -59,6 +62,8 @@ export default defineComponent({
     const userPic = computed(() => store.getters.userPic);
     const token = computed(() => store.getters.token);
 
+    const guard = useGuard();
+
     function goPage(path, name) {
       if (!path && !name) {
         changeIndex(NavName.Home);
@@ -72,14 +77,22 @@ export default defineComponent({
     async function goMenuList(path) {
       if (path == RouterName.SignOut) {
         proxy.$store.commit("setToken", false);
+        if(cookies.isKey("GuardLogin")){
+          // 登出后的回调地址请在 Authing 控制台应用 -> 自建应用 -> 应用详情 -> 应用配置 -> 登出回调 URL 中配置
+          const res = await guard.logout();
+          cookies.remove("GuardLogin");
+        }
+
         const result = (await HttpManager.logout()) as ResponseBody;
         (proxy as any).$message({
           message: result.message,
           type: result.type,
         });
+
         if(cookies.isKey("userAccessToken")){
           cookies.remove("userAccessToken");
         }
+
         changeIndex(NavName.Home);
         routerManager(RouterName.Home, { path: RouterName.Home });
       } else {

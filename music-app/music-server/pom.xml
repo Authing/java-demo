@@ -127,7 +127,7 @@
         <dependency>
             <groupId>cn.authing</groupId>
             <artifactId>authing-java-sdk</artifactId>
-            <version>{{LATEST_VERSION}}</version>
+            <version>3.0.1</version>
         </dependency>
 
     </dependencies>

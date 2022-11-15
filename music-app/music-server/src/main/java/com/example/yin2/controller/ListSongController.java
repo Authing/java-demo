@@ -1,27 +1,22 @@
 package com.example.yin2.controller;
-
 import cn.authing.sdk.java.client.AuthenticationClient;
 import cn.authing.sdk.java.client.ManagementClient;
 import cn.authing.sdk.java.dto.*;
+import cn.authing.sdk.java.dto.authentication.UserInfo;
+import cn.authing.sdk.java.util.JsonUtils;
+import cn.hutool.core.util.StrUtil;
 import com.example.yin2.common.ErrorMessage;
 import com.example.yin2.common.SuccessMessage;
 import com.example.yin2.domain.ListSong;
 import com.example.yin2.service.impl.ListSongServiceImpl;
-
 import org.apache.commons.lang3.ObjectUtils.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class ListSongController {
@@ -31,6 +26,9 @@ public class ListSongController {
 
     @Autowired
     private ManagementClient managementClient;
+
+    @Autowired
+    private AuthenticationClient authenticationClient;
 
     @Value("${authing.config.appId}")
     String AUTHING_APP_ID;
@@ -69,11 +67,14 @@ public class ListSongController {
 
     // 返回歌单里指定歌单 ID 的歌曲
     @RequestMapping(value = "/listSong/detail", method = RequestMethod.GET)
-    public Object listSongOfSongId(HttpServletRequest req, HttpSession session) {
+    public Object listSongOfSongId(HttpServletRequest req,@CookieValue(value = "userAccessToken",required = false) String accessToken) {
+        if(StrUtil.isBlank(accessToken)){
+            return new ErrorMessage("accessToken 已失效，请重新登录").getMessage();
+        }
         String songListId = req.getParameter("songListId");
 
         // 获取歌单的 ids
-        List<String> resources = getResources(session);
+        List<String> resources = getResources(accessToken);
         if (resources.contains("*") || resources.contains(songListId)) {
             return new SuccessMessage<List<ListSong>>("添加成功", listSongService.listSongOfSongId(Integer.parseInt(songListId)))
                     .getMessage();
@@ -83,14 +84,16 @@ public class ListSongController {
 
     /**
      * 获取资源列表
-     * @param session
+     * @param accessToken
      * @return
      */
-    private List<String> getResources(HttpSession session) {
+    private List<String> getResources(String accessToken) {
+        UserInfo userInfo = authenticationClient.getUserInfoByAccessToken(accessToken);
+        String authingUserId = userInfo.getSub();
+
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
         getUserRolesDto.setNamespace(AUTHING_APP_ID);
-        getUserRolesDto.setUserId(session.getAttribute("username").toString());
-        getUserRolesDto.setUserIdType(ResignUserReqDto.UserIdType.USERNAME.getValue());
+        getUserRolesDto.setUserId(authingUserId);
         //  调用 authing 接口 (获取用户的角色)
         RolePaginatedRespDto userRoles = managementClient.getUserRoles(getUserRolesDto);
         List<RoleDto> roles = userRoles.getData().getList();

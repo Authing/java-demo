@@ -17,6 +17,8 @@ public class Collect {
 
     private Date createTime;
 
+    private String ownerId;
+
     public Integer getId() {
         return id;
     }
@@ -63,6 +65,14 @@ public class Collect {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override

@@ -21,6 +21,8 @@ public class Comment {
 
     private Integer up;
 
+    private String ownerId;
+
     public Integer getId() {
         return id;
     }
@@ -83,6 +85,14 @@ public class Comment {
 
     public void setUp(Integer up) {
         this.up = up;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override

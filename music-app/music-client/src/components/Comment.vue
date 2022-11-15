@@ -19,7 +19,7 @@
       </div>
       <div ref="up" class="comment-ctr" @click="setSupport(item.id, item.up, index)">
         <div><yin-icon :icon="iconList.Support"></yin-icon> {{ item.up }}</div>
-        <el-icon v-if="item.userId === userId" @click="deleteComment(item.id, index)"><delete /></el-icon>
+        <el-icon v-if="item.ownerId === userId" @click="deleteComment(item.id, index)"><delete /></el-icon>
       </div>
     </li>
   </ul>
@@ -68,8 +68,8 @@ export default defineComponent({
         commentList.value = result.data;
         for (let index = 0; index < commentList.value.length; index++) {
           // 获取评论用户的昵称和头像
-          const resultUser = (await HttpManager.getUserOfId(commentList.value[index].userId)) as ResponseBody;
-          commentList.value[index].avator = resultUser.data[0].avator;
+          const resultUser = (await HttpManager.getUserOfId(commentList.value[index].ownerId)) as ResponseBody;
+          // commentList.value[index].avator = resultUser.data[index].avator;
           commentList.value[index].username = resultUser.data[0].username;
         }
       } catch (error) {

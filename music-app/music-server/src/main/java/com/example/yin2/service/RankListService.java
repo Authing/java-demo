@@ -8,6 +8,6 @@ public interface RankListService {
 
     int rankOfSongListId(Long songListId);
 
-    int getUserRank(Long consumerId, Long songListId);
+    int getUserRank(String authingUserId, Long songListId);
 
 }

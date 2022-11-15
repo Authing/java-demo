@@ -22,6 +22,7 @@ import { defineComponent, getCurrentInstance, ref, reactive } from "vue";
 import mixin from "@/mixins/mixin";
 import { HttpManager } from "@/api/index";
 import { RouterName, MUSICNAME } from "@/enums";
+import { useGuard } from "@authing/guard-vue3";
 
 export default defineComponent({
   setup() {
@@ -89,7 +90,7 @@ export default defineComponent({
 
 .login {
   position: absolute;
-  left: 50%;
+  left: 52%;
   top: 50%;
   width: 300px;
   margin: -150px 0 0 -190px;
