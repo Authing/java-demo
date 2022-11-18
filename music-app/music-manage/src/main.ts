@@ -21,5 +21,5 @@ declare module "@vue/runtime-core" {
 }
 
 const app = createApp(App);
-app.config.globalProperties.$cookies = VueCookies;
+app.config.globalProperties.cookies = VueCookies;
 app.use(store).use(router).use(ElementPlus).mount("#app");

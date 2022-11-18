@@ -40,7 +40,7 @@ export default defineComponent({
     });
 
     let internalInstance = getCurrentInstance();
-    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    let cookies = internalInstance.appContext.config.globalProperties.cookies;
     async function submitForm() {
       let params = new URLSearchParams();
           params.append("username", ruleForm.username);
