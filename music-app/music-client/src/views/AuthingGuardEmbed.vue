@@ -31,7 +31,7 @@
     const router = useRouter()
 
     let internalInstance = getCurrentInstance();
-    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    let cookies = internalInstance.appContext.config.globalProperties.cookies;
 
     guard.on('login', (userInfo: User) => {
         console.log('userInfo in login: ', userInfo)
