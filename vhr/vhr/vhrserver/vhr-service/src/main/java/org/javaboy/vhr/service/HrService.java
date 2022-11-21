@@ -1,10 +1,15 @@
 package org.javaboy.vhr.service;
 
+import cn.authing.sdk.java.client.AuthenticationClient;
+import cn.authing.sdk.java.client.ManagementClient;
+import cn.authing.sdk.java.dto.*;
 import org.javaboy.vhr.mapper.HrMapper;
 import org.javaboy.vhr.mapper.HrRoleMapper;
 import org.javaboy.vhr.model.Hr;
+import org.javaboy.vhr.model.Role;
 import org.javaboy.vhr.utils.HrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,15 +35,65 @@ public class HrService implements UserDetailsService {
     HrMapper hrMapper;
     @Autowired
     HrRoleMapper hrRoleMapper;
+    @Autowired
+    ManagementClient managementClient;
+    @Value("${authing.config.appId}")
+    String namespace;
 
+    // 更改为 authing 登录逻辑
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Hr hr = hrMapper.loadUserByUsername(username);
-        if (hr == null) {
-            throw new UsernameNotFoundException("用户名不存在!");
+//        Hr hr = hrMapper.loadUserByUsername(username);
+//        if (hr == null) {
+//            throw new UsernameNotFoundException("用户名不存在!");
+//        }
+//        hr.setRoles(hrMapper.getHrRolesById(hr.getId()));
+//        return hr;
+        GetUserDto getUserDto = new GetUserDto();
+        getUserDto.setUserIdType("username");
+        getUserDto.setUserId(username);
+        UserSingleRespDto respDto = managementClient.getUser(getUserDto);
+        UserDto authingUser = respDto.getData();
+        return convertAuthingUserToHr(authingUser);
+    }
+
+    // authing 用户实体类和 hr 实体类的对应
+    public Hr convertAuthingUserToHr(UserDto authingUser){
+        Hr hr = new Hr();
+        hr.setName(authingUser.getName());
+        hr.setPhone(authingUser.getPhone());
+        hr.setAddress(authingUser.getAddress());
+        if(authingUser.getStatus().getValue()=="Activated") {
+            hr.setEnabled(true);
+        }else{
+            hr.setEnabled(false);
         }
-        hr.setRoles(hrMapper.getHrRolesById(hr.getId()));
+        hr.setUsername(authingUser.getUsername());
+
+        // authing 没有 password、userface、remark 属性
+
+        List<Role> roleList = new ArrayList<>();
+        GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
+        getUserRolesDto.setUserIdType("username");
+        getUserRolesDto.setUserId(authingUser.getUsername());
+        getUserRolesDto.setNamespace(namespace);
+        RolePaginatedRespDto respDto = managementClient.getUserRoles(getUserRolesDto);
+        List<RoleDto> authingRoleList = respDto.getData().getList();
+        for (RoleDto authingRole:authingRoleList){
+            roleList.add(convertAuthingRoleToRole(authingRole));
+        }
+        hr.setRoles(roleList);
+
+        hr.setOwnerId(authingUser.getUserId());
         return hr;
+    }
+
+    // authing 用户角色和 Role 实体类的对应
+    public Role convertAuthingRoleToRole(RoleDto authingRole){
+        Role role = new Role();
+        role.setName(authingRole.getCode());
+        role.setNameZh(authingRole.getDescription());
+        return role;
     }
 
     public List<Hr> getAllHrs(String keywords) {

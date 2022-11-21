@@ -24,3 +24,11 @@ server:
 fastdfs:
   nginx:
     host: http://192.168.91.128/
+authing:
+  config:
+    appId: 63759fb73341c5eec9348b2d
+    appSecret: 7226f6e14ced84bb0bee3a52078495f4
+    appHost: https://kuluqi4.authing.cn
+    userPoolId: 63450a7313f9b2bb4c5761a3
+    userPoolSecret: 645141dd660fd26bd1d3ecf7f09cd34a
+    redirectUri: http://127.0.0.1:8081/callback

@@ -18,13 +18,15 @@
                 <el-input size="normal" type="password" v-model="loginForm.password" auto-complete="off"
                           placeholder="请输入密码"></el-input>
             </el-form-item>
-            <el-form-item prop="code">
+            <!-- <el-form-item prop="code">
                 <el-input size="normal" type="text" v-model="loginForm.code" auto-complete="off"
                           placeholder="点击图片更换验证码" @keydown.enter.native="submitLogin" style="width: 250px"></el-input>
                 <img :src="vcUrl" @click="updateVerifyCode" alt="" style="cursor: pointer">
-            </el-form-item>
-            <el-checkbox size="normal" class="loginRemember" v-model="checked"></el-checkbox>
+            </el-form-item> -->
+            <el-checkbox size="normal" class="loginRemember" v-model="checked">记住我</el-checkbox>
             <el-button size="normal" type="primary" style="width: 100%;" @click="submitLogin">登录</el-button>
+            <hr/>
+            <el-button size="normal" type="primary" style="width: 100%;" @click="authingGuardLogin">authing 登录</el-button>
         </el-form>
     </div>
 </template>
@@ -51,6 +53,27 @@
             }
         },
         methods: {
+            authingGuardLogin(){
+                console.log("authingGuardLogin");
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        this.loading = true;
+                        this.postRequest('/doLogin', this.loginForm).then(resp => {
+                            this.loading = false;
+                            if (resp) {
+                                this.$store.commit('INIT_CURRENTHR', resp.obj);
+                                window.sessionStorage.setItem("user", JSON.stringify(resp.obj));
+                                let path = this.$route.query.redirect;
+                                this.$router.replace((path == '/' || path == undefined) ? '/home' : path);
+                            }else{
+                                this.vcUrl = '/verifyCode?time='+new Date();
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+            },
             updateVerifyCode() {
                 this.vcUrl = '/verifyCode?time='+new Date();
             },

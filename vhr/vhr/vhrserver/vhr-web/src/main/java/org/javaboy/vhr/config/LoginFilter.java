@@ -25,16 +25,20 @@ import java.util.Map;
  * @GitHub https://github.com/lenve
  * @Gitee https://gitee.com/lenve
  */
+
+// 自定义过滤器，实现以 JSON 格式传递登录参数以及验证码功能
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Autowired
     SessionRegistry sessionRegistry;
+
+    // TODO 取消验证码功能
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         if (!request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException(
                     "Authentication method not supported: " + request.getMethod());
         }
-        String verify_code = (String) request.getSession().getAttribute("verify_code");
+//        String verify_code = (String) request.getSession().getAttribute("verify_code");
         if (request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE) || request.getContentType().contains(MediaType.APPLICATION_JSON_UTF8_VALUE)) {
             Map<String, String> loginData = new HashMap<>();
             try {
@@ -42,7 +46,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             } catch (IOException e) {
             }finally {
                 String code = loginData.get("code");
-                checkCode(response, code, verify_code);
+//                checkCode(response, code, verify_code);
             }
             String username = loginData.get(getUsernameParameter());
             String password = loginData.get(getPasswordParameter());
@@ -61,15 +65,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             sessionRegistry.registerNewSession(request.getSession(true).getId(), principal);
             return this.getAuthenticationManager().authenticate(authRequest);
         } else {
-            checkCode(response, request.getParameter("code"), verify_code);
+//            checkCode(response, request.getParameter("code"), verify_code);
             return super.attemptAuthentication(request, response);
         }
     }
 
-    public void checkCode(HttpServletResponse resp, String code, String verify_code) {
-        if (code == null || verify_code == null || "".equals(code) || !verify_code.toLowerCase().equals(code.toLowerCase())) {
-            //验证码不正确
-            throw new AuthenticationServiceException("验证码不正确");
-        }
-    }
+//    public void checkCode(HttpServletResponse resp, String code, String verify_code) {
+//        if (code == null || verify_code == null || "".equals(code) || !verify_code.toLowerCase().equals(code.toLowerCase())) {
+//            //验证码不正确
+//            throw new AuthenticationServiceException("验证码不正确");
+//        }
+//    }
 }

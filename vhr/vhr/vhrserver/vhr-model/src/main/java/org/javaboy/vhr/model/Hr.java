@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Hr implements UserDetails {
+    // TODO 不需要
     private Integer id;
 
     private String name;
@@ -30,7 +31,23 @@ public class Hr implements UserDetails {
     private String userface;
 
     private String remark;
+
+    // 不需要
     private List<Role> roles;
+
+    // 对应 authing userId
+    private String ownerId;
+
+    // 获取当前用户所具有的角色
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>(roles.size());
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return authorities;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -101,16 +118,19 @@ public class Hr implements UserDetails {
         return username;
     }
 
+    // 默认 true
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    // 默认 true
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+    // 默认 true
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
@@ -123,16 +143,6 @@ public class Hr implements UserDetails {
 
     public void setUsername(String username) {
         this.username = username == null ? null : username.trim();
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>(roles.size());
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
-        return authorities;
     }
 
     public String getPassword() {
@@ -157,5 +167,13 @@ public class Hr implements UserDetails {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 }
