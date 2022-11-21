@@ -44,7 +44,7 @@ export default defineComponent({
   setup() {
 
     let internalInstance = getCurrentInstance();
-    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    let cookies = internalInstance.appContext.config.globalProperties.cookies;
 
     const { proxy } = getCurrentInstance();
     const store = useStore();

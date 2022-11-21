@@ -41,7 +41,7 @@ import { HttpManager } from "@/api/index";
 
     const isSuperAdminFlag = ref(false);
     let internalInstance = getCurrentInstance();
-    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    let cookies = internalInstance.appContext.config.globalProperties.cookies;
     if(cookies.get("isSuperAdmin") === "true"){
       isSuperAdminFlag.value = true;
     }

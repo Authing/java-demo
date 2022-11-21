@@ -41,7 +41,7 @@ export default defineComponent({
   },
   setup() {
     let internalInstance = getCurrentInstance();
-    let cookies = internalInstance.appContext.config.globalProperties.$cookies;
+    let cookies = internalInstance.appContext.config.globalProperties.cookies;
 
     const { routerManager } = mixin();
     const store = useStore();
