@@ -30,6 +30,7 @@
         <result column="beginContract" property="beginContract" jdbcType="DATE"/>
         <result column="endContract" property="endContract" jdbcType="DATE"/>
         <result column="workAge" property="workAge" jdbcType="INTEGER"/>
+        <result column="salaryId" property="salaryId" jdbcType="INTEGER"/>
     </resultMap>
     <resultMap id="AllEmployeeInfo" type="org.javaboy.vhr.model.Employee" extends="BaseResultMap">
         <association property="nation" javaType="org.javaboy.vhr.model.Nation">
@@ -139,12 +140,8 @@
             limit #{page},#{size}
         </if>
     </select>
-    <select id="getAllEmployee" resultMap="AllEmployeeInfo">
-        select e.*,p.`id` as pid,p.`name` as pname,n.`id` as nid,n.`name` as nname,d.`id` as did,d.`name` as
-        dname,j.`id` as jid,j.`name` as jname,pos.`id` as posid,pos.`name` as posname
-        from employee e,nation n,politicsstatus p,department d,joblevel j,position pos
-        where e.`nationId`=n.`id` and e.`politicId`=p.`id` and
-        e.`departmentId`=d.`id` and e.`jobLevelId`=j.`id` and e.`posId`=pos.`id`
+    <select id="getAllEmployee" resultMap="BaseResultMap">
+        select * from employee
     </select>
     <select id="getTotal" resultType="java.lang.Long">
         select count(*) from employee e

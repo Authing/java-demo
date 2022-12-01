@@ -13,6 +13,8 @@ public class SalaryService {
     @Autowired
     SalaryMapper salaryMapper;
 
+    public Salary getSalaryById(Integer id){ return salaryMapper.selectByPrimaryKey(id); }
+
     public List<Salary> getAllSalaries() {
         return salaryMapper.getAllSalaries();
     }

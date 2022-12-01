@@ -44,10 +44,7 @@ public class HrController {
     // 改变账号状态
     @PutMapping("/status")
     public RespBean updateHrStatus(@RequestBody Hr hr) {
-        if (hrService.updateHrStatus(hr)) {
-            return RespBean.ok("更新成功!");
-        }
-        return RespBean.error("更新失败!");
+        return hrService.updateHrStatus(hr);
     }
     @GetMapping("/roles")
     public List<Role> getAllRoles() {
@@ -56,17 +53,11 @@ public class HrController {
 
     @PostMapping("/role")
     public RespBean updateHrRole(@RequestBody UpdateHrRoleDto updateHrRoleDto) {
-        if (hrService.updateHrRole(updateHrRoleDto.getAuthingUserId(), updateHrRoleDto.getRoleCodes())) {
-            return RespBean.ok("更新成功!");
-        }
-        return RespBean.error("更新失败!");
+        return hrService.updateHrRole(updateHrRoleDto.getAuthingUserId(), updateHrRoleDto.getRoleCodes());
     }
 
     @DeleteMapping("/{authingUserId}")
     public RespBean deleteHrByAuthingUserId(@PathVariable String authingUserId) {
-        if (hrService.deleteHrByAuthingUserId(authingUserId)) {
-            return RespBean.ok("删除成功!");
-        }
-        return RespBean.error("删除失败!");
+        return hrService.deleteHrByAuthingUserId(authingUserId);
     }
 }

@@ -103,7 +103,7 @@
             addDep2Deps(deps, dep) {
                 for (let i = 0; i < deps.length; i++) {
                     let d = deps[i];
-                    if (d.authingDepId == dep.parentAuthingId) {
+                    if (d.authingDepartmentId == dep.parentAuthingId) {
                         d.children = d.children.concat(dep);
                         if (d.children.length > 0) {
                             d.parent = true;
@@ -125,17 +125,17 @@
                     }
                 })
             },
-            removeDepFromDeps(p,deps,authingDepId) {
+            removeDepFromDeps(p,deps,authingDepartmentId) {
                 for(let i=0;i<deps.length;i++){
                     let d = deps[i];
-                    if (d.authingDepId == authingDepId) {
+                    if (d.authingDepartmentId == authingDepartmentId) {
                         deps.splice(i, 1);
                         if (deps.length == 0) {
                             p.parent = false;
                         }
                         return;
                     }else{
-                        this.removeDepFromDeps(d,d.children,authingDepId);
+                        this.removeDepFromDeps(d,d.children,authingDepartmentId);
                     }
                 }
             },
@@ -148,9 +148,9 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                       this.deleteRequest("/system/basic/department/"+data.authingDepId).then(resp=>{
+                       this.deleteRequest("/system/basic/department/"+data.authingDepartmentId).then(resp=>{
                            if (resp) {
-                                this.removeDepFromDeps(null,this.deps,data.authingDepId);
+                                this.removeDepFromDeps(null,this.deps,data.authingDepartmentId);
                                 this.initDeps();
                            }
                        })
@@ -163,13 +163,15 @@
                 }
             },
             showAddDepView(data) {
+                console.log("addData:",data)
                 this.pname = data.name;
                 this.dep.parentId = data.id;
-                this.dep.parentAuthingId = data.authingDepId;
+                this.dep.parentAuthingId = data.authingDepartmentId;
                 this.dialogVisible = true;
             },
             initDeps() {
                 this.getRequest("/system/basic/department/").then(resp => {
+                    console.log("deps:",resp)
                     if (resp) {
                         this.deps = resp;
                     }

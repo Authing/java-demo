@@ -58,9 +58,9 @@ public class DepartmentService {
         List<Department> res = new ArrayList<>();
         list.forEach(child -> {
             Department department = authingDepToDepConverter.convert(child);
+            // 手动设置父部门 id
+            department.setParentAuthingId(departmentDto.getDepartmentId());
             if(child.getHasChildren()) {
-                // 手动设置父部门 id
-                department.setParentAuthingId(departmentDto.getDepartmentId());
                 department.setChildren(listChildren(child));
             }
             res.add(department);

@@ -21,7 +21,7 @@ public class SobConfigController {
 
     @GetMapping("/")
     public RespPageBean getEmployeeByPageWithSalary(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size) {
-        return employeeService.getEmployeeByPageWithSalary(page, size);
+        return employeeService.getAuthEmployeeByPageWithSalary(page, size);
     }
 
     @GetMapping("/salaries")
@@ -30,11 +30,7 @@ public class SobConfigController {
     }
 
     @PutMapping("/")
-    public RespBean updateEmployeeSalaryById(Integer eid, Integer sid) {
-        Integer result = employeeService.updateEmployeeSalaryById(eid, sid);
-        if (result == 1 || result == 2) {
-            return RespBean.ok("更新成功");
-        }
-        return RespBean.error("更新失败");
+    public RespBean updateEmployeeSalaryById(@RequestBody Employee employee) {
+        return employeeService.updateAuthEmpSalary(employee);
     }
 }

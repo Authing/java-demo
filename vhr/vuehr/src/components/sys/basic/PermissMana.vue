@@ -112,10 +112,10 @@
             doUpdate(rname, index) {
                 let tree = this.$refs.tree[index];
                 let selectedKeys = tree.getCheckedKeys(true);
-                let updateAuthResDto = []
+                let updateAuthResDto = {}
                 updateAuthResDto.roleName = rname;
-                updateAuthResDto.menuIds = {}
-                let url = '/system/basic/permission';
+                updateAuthResDto.menuIds = []
+                let url = '/system/basic/permission/';
                 selectedKeys.forEach(key => {
                     updateAuthResDto.menuIds.push(key);
                 })

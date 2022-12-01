@@ -65,6 +65,10 @@ public class EmployeeService {
         optionsDto.setFuzzySearchOn(searchList);
         // 获取用户自定义字段
         optionsDto.setWithCustomData(true);
+        List<SortingDto> sortingDtoList = new ArrayList<>();
+        SortingDto sortingDto = new SortingDto();
+        sortingDto.setField(SortingDto.Field.USERNAME);
+        sortingDto.setOrder(SortingDto.Order.ASC);
         PaginationDto paginationDto = new PaginationDto();
         paginationDto.setPage(page);
         // authing 分页每页最多 50 条数据
@@ -224,6 +228,25 @@ public class EmployeeService {
         return employeeMapper.updateEmployeeSalaryById(eid, sid);
     }
 
+    public RespBean updateAuthEmpSalary(Employee employee) {
+        CreateUserInfoDto createUserInfoDto = authingUserEmployeeConverter.EmpToAuth(employee);
+        UpdateUserReqDto reqDto = new UpdateUserReqDto();
+        BeanUtils.copyProperties(createUserInfoDto,reqDto);
+
+        reqDto.setUserId(employee.getOwnerId());
+
+        if(StrUtil.equals(createUserInfoDto.getGender().getValue(),"M")){
+            reqDto.setGender(UpdateUserReqDto.Gender.M);
+        } else if (StrUtil.equals(createUserInfoDto.getGender().getValue(),"F")) {
+            reqDto.setGender(UpdateUserReqDto.Gender.F);
+        }else{
+            reqDto.setGender(UpdateUserReqDto.Gender.U);
+        }
+
+        UserSingleRespDto respDto = managementClient.updateUser(reqDto);
+        return respDto.getStatusCode() == 200 ? RespBean.ok("修改成功") : RespBean.error(respDto.getMessage());
+    }
+
     public Employee getEmployeeById(Integer empId) {
         return employeeMapper.getEmployeeById(empId);
     }
@@ -279,5 +302,9 @@ public class EmployeeService {
         reqDto.setUserIds(authingUserIdList);
         IsSuccessRespDto respDto = managementClient.deleteUsersBatch(reqDto);
         return respDto.getStatusCode() == 200 ? RespBean.ok("删除成功") : RespBean.error(respDto.getMessage());
+    }
+
+    public RespPageBean getAuthEmployeeByPageWithSalary(Integer page, Integer limit) {
+        return this.getAuthingEmployeeByPage(page,limit,new Employee(),null);
     }
 }

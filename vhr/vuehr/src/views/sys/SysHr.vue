@@ -18,8 +18,9 @@
                     </div>
                     <div class="userinfo-container">
                         <div>用户名：{{hr.username}}</div>
-                        <div>手机号码：{{hr.phone}}</div>
-                        <div>电话号码：{{hr.telephone}}</div>
+                        <!-- <div>手机号码：{{hr.phone}}</div>
+                        <div>电话号码：{{hr.telephone}}</div> -->
+                        <div>Authing 账号 ID： {{hr.ownerId}}</div>
                         <div>地址：{{hr.address}}</div>
                         <div>用户状态：
                             <el-switch
@@ -78,7 +79,7 @@
         },
         methods: {
             deleteHr(hr) {
-                this.$confirm('此操作将永久删除【'+hr.name+'】, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除【'+hr.username+'】, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'

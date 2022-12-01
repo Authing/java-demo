@@ -94,7 +94,7 @@ public class HrService implements UserDetailsService {
         return hrMapper.updateByPrimaryKeySelective(hr);
     }
 
-    public boolean updateHrStatus(Hr hr){
+    public RespBean updateHrStatus(Hr hr){
         UpdateUserReqDto reqDto = new UpdateUserReqDto();
         reqDto.setUserId(hr.getOwnerId());
         if(hr.isEnabled()){
@@ -103,14 +103,12 @@ public class HrService implements UserDetailsService {
             reqDto.setStatus(UpdateUserReqDto.Status.DEACTIVATED);
         }
         UserSingleRespDto respDto = managementClient.updateUser(reqDto);
-        if (respDto.getStatusCode() == 200) {
-            return true;
-        }
-        return false;
+        return respDto.getStatusCode() == 200 ?
+                RespBean.ok("修改成功！") : RespBean.error(respDto.getMessage());
     }
 
     @Transactional
-    public boolean updateHrRole(String authingUserId, String[] roleCodes) {
+    public RespBean updateHrRole(String authingUserId, String[] roleCodes) {
         ListRolesDto listRolesDto = new ListRolesDto();
         listRolesDto.setNamespace(namespace);
         // 获取全部用户角色
@@ -130,7 +128,7 @@ public class HrService implements UserDetailsService {
             revokeRoleDto.setCode(roleDto.getCode());
             IsSuccessRespDto isSuccessRespDto = managementClient.revokeRole(revokeRoleDto);
             if(isSuccessRespDto.getStatusCode() != 200){
-                return false;
+                return RespBean.error(isSuccessRespDto.getMessage());
             }
         }
         // 添加角色
@@ -141,10 +139,10 @@ public class HrService implements UserDetailsService {
             assignRoleDto.setCode(code);
             IsSuccessRespDto isSuccessRespDto = managementClient.assignRole(assignRoleDto);
             if(isSuccessRespDto.getStatusCode() != 200){
-                return false;
+                return RespBean.error(isSuccessRespDto.getMessage());
             }
         }
-        return true;
+        return RespBean.ok("修改成功！");
     }
 
     public Integer deleteHrById(Integer id) {
@@ -152,13 +150,14 @@ public class HrService implements UserDetailsService {
     }
 
     // 删除用户（可批量）
-    public boolean deleteHrByAuthingUserId(String authingUserId){
+    public RespBean deleteHrByAuthingUserId(String authingUserId){
         DeleteUsersBatchDto reqDto = new DeleteUsersBatchDto();
         List<String> authingUserIdList = new ArrayList<>();
         authingUserIdList.add(authingUserId);
         reqDto.setUserIds(authingUserIdList);
         IsSuccessRespDto respDto = managementClient.deleteUsersBatch(reqDto);
-        return respDto.getData().getSuccess();
+        return respDto.getStatusCode() == 200 ?
+                RespBean.ok("删除成功！") : RespBean.error(respDto.getMessage());
     }
 
     public List<Hr> getAllHrsExceptCurrentHr() {

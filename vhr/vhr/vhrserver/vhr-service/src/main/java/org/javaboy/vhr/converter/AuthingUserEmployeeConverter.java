@@ -31,6 +31,8 @@ public class AuthingUserEmployeeConverter {
     PositionService positionService;
     @Autowired
     DepartmentService departmentService;
+    @Autowired
+    SalaryService salaryService;
 
     // authing 用户转换成 employee
     public Employee AuthToEmp(UserDto userDto){
@@ -129,6 +131,11 @@ public class AuthingUserEmployeeConverter {
             employee.setWorkAge((Integer) customData.get("workAge"));
         }
 
+        if(customData.containsKey("salaryId")){
+            employee.setSalaryId((Integer) customData.get("salaryId"));
+            employee.setSalary(salaryService.getSalaryById((Integer) customData.get("salaryId")));
+        }
+
         return employee;
     }
 
@@ -169,7 +176,9 @@ public class AuthingUserEmployeeConverter {
         createUserInfoDto.setAddress(employee.getAddress());
 
         List<String> departmentIds = new ArrayList<>();
-        departmentIds.add(String.valueOf(employee.getAuthingDepartmentId()));
+        if(StrUtil.isNotBlank(employee.getAuthingDepartmentId())) {
+            departmentIds.add(employee.getAuthingDepartmentId());
+        }
         createUserInfoDto.setDepartmentIds(departmentIds);
 
         customData.setJobLevelId(employee.getJobLevelId());
@@ -188,6 +197,7 @@ public class AuthingUserEmployeeConverter {
         customData.setBeginContract(employee.getBeginContract());
         customData.setEndContract(employee.getEndContract());
         customData.setWorkAge(employee.getWorkAge());
+        customData.setSalaryId(employee.getSalaryId());
         createUserInfoDto.setCustomData(customData);
         return createUserInfoDto;
     }
@@ -203,10 +213,8 @@ public class AuthingUserEmployeeConverter {
                 CreateUserBatchReqDto reqDto = new CreateUserBatchReqDto();
                 reqDto.setList(authingUserList);
                 UserListRespDto respDto = managementClient.createUsersBatch(reqDto);
-                if(respDto.getStatusCode() == 200) {
+                if(respDto.getStatusCode() != null){
                     authingUserList.clear();
-                }else{
-                    throw new AuthingException(respDto.getMessage());
                 }
             }
         }
