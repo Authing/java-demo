@@ -43,6 +43,10 @@ public class Department implements Serializable {
     private List<Department> children = new ArrayList<>();
     private Integer result;
 
+    private String authingDepartmentId;
+
+    private String parentAuthingId;
+
     public Integer getResult() {
         return result;
     }
@@ -105,5 +109,21 @@ public class Department implements Serializable {
 
     public void setParent(Boolean parent) {
         isParent = parent;
+    }
+
+    public String getAuthingDepartmentId() {
+        return authingDepartmentId;
+    }
+
+    public void setAuthingDepartmentId(String authingDepartmentId) {
+        this.authingDepartmentId = authingDepartmentId;
+    }
+
+    public String getParentAuthingId() {
+        return parentAuthingId;
+    }
+
+    public void setParentAuthingId(String parentAuthingId) {
+        this.parentAuthingId = parentAuthingId;
     }
 }

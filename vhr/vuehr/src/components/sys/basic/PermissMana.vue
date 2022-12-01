@@ -21,7 +21,7 @@
                          element-loading-background="rgba(0, 0, 0, 0.8)"
                          accordion
                          @change="change">
-                <el-collapse-item :title="r.nameZh" :name="r.id" v-for="(r,index) in roles" :key="index">
+                <el-collapse-item :title="r.nameZh" :name="r.name" v-for="(r,index) in roles" :key="r.name">
                     <el-card class="box-card">
                         <div slot="header" class="clearfix">
                             <span>可访问的资源</span>
@@ -38,7 +38,7 @@
                                     :data="allmenus" :props="defaultProps"></el-tree>
                             <div style="display: flex;justify-content: flex-end">
                                 <el-button @click="cancelUpdate">取消修改</el-button>
-                                <el-button type="primary" @click="doUpdate(r.id,index)">确认修改</el-button>
+                                <el-button type="primary" @click="doUpdate(r.name,index)">确认修改</el-button>
                             </div>
                         </div>
                     </el-card>
@@ -79,7 +79,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.deleteRequest("/system/basic/permiss/role/" + role.id).then(resp => {
+                    this.deleteRequest("/system/basic/permission/role/" + role.name).then(resp => {
                         if (resp) {
                             this.initRoles();
                         }
@@ -94,7 +94,7 @@
             doAddRole() {
                 if (this.role.name && this.role.nameZh) {
                     this.globalLoading = true;
-                    this.postRequest("/system/basic/permiss/role", this.role).then(resp => {
+                    this.postRequest("/system/basic/permission/role", this.role).then(resp => {
                     this.globalLoading = false;
                         if (resp) {
                             this.role.name = '';
@@ -109,34 +109,40 @@
             cancelUpdate() {
                 this.activeName = -1;
             },
-            doUpdate(rid, index) {
+            doUpdate(rname, index) {
                 let tree = this.$refs.tree[index];
                 let selectedKeys = tree.getCheckedKeys(true);
-                let url = '/system/basic/permiss/?rid=' + rid;
+                let updateAuthResDto = []
+                updateAuthResDto.roleName = rname;
+                updateAuthResDto.menuIds = {}
+                let url = '/system/basic/permission';
                 selectedKeys.forEach(key => {
-                    url += '&mids=' + key;
+                    updateAuthResDto.menuIds.push(key);
                 })
-                this.putRequest(url).then(resp => {
+                this.postRequest(url,updateAuthResDto).then(resp => {
                     if (resp) {
                         this.activeName = -1;
                     }
                 })
             },
             change(rid) {
+                console.log("rid:",rid)
                 if (rid) {
                     this.initAllMenus();
                     this.initSelectedMenus(rid);
                 }
             },
-            initSelectedMenus(rid) {
-                this.getRequest("/system/basic/permiss/mids/" + rid).then(resp => {
+            initSelectedMenus(roleName) {
+                
+                this.getRequest("/system/basic/permission/mids/" + roleName).then(resp => {                 
                     if (resp) {
                         this.selectedMenus = resp;
                     }
                 })
             },
             initAllMenus() {
-                this.getRequest("/system/basic/permiss/menus").then(resp => {
+                this.getRequest("/system/basic/permission/menus").then(resp => {
+                    console.log("allMenus:",resp)
                     if (resp) {
                         this.allmenus = resp;
                     }
@@ -144,7 +150,7 @@
             },
             initRoles() {
                 this.loading = true;
-                this.getRequest("/system/basic/permiss/").then(resp => {
+                this.getRequest("/system/basic/permission/").then(resp => {
                     this.loading = false;
                     if (resp) {
                         this.roles = resp;

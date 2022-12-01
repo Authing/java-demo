@@ -23,4 +23,8 @@ public class PoliticsstatusService {
     public List<Politicsstatus> getAllPoliticsstatus() {
         return politicsstatusMapper.getAllPoliticsstatus();
     }
+
+    public Politicsstatus getPoliticsstatusById(Integer id) {
+        return politicsstatusMapper.selectByPrimaryKey(id);
+    }
 }

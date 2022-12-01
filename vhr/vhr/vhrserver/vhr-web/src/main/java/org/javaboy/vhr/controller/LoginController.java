@@ -27,13 +27,13 @@ public class LoginController {
         return RespBean.error("尚未登录，请登录!");
     }
 
-//    @GetMapping("/verifyCode")
-//    public void verifyCode(HttpServletRequest request, HttpServletResponse resp) throws IOException {
-//        VerificationCode code = new VerificationCode();
-//        BufferedImage image = code.getImage();
-//        String text = code.getText();
-//        HttpSession session = request.getSession(true);
-//        session.setAttribute("verify_code", text);
-//        VerificationCode.output(image,resp.getOutputStream());
-//    }
+    @GetMapping("/verifyCode")
+    public void verifyCode(HttpServletRequest request, HttpServletResponse resp) throws IOException {
+        VerificationCode code = new VerificationCode();
+        BufferedImage image = code.getImage();
+        String text = code.getText();
+        HttpSession session = request.getSession(true);
+        session.setAttribute("verify_code", text);
+        VerificationCode.output(image,resp.getOutputStream());
+    }
 }

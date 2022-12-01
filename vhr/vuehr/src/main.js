@@ -97,6 +97,8 @@ Vue.use(Icon);
 Vue.use(Select);
 Vue.use(Form);
 Vue.use(Tag);
+// 添加依赖
+Vue.prototype.$message = Message;
 Vue.prototype.$alert = MessageBox.alert
 Vue.prototype.$confirm = MessageBox.confirm
 

@@ -1,5 +1,6 @@
 package org.javaboy.vhr.controller.emp;
 
+import cn.hutool.core.util.StrUtil;
 import org.javaboy.vhr.model.*;
 import org.javaboy.vhr.service.*;
 import org.javaboy.vhr.utils.POIUtils;
@@ -39,31 +40,22 @@ public class EmpBasicController {
 
     @GetMapping("/")
     public RespPageBean getEmployeeByPage(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer size, Employee employee, Date[] beginDateScope) {
-        return employeeService.getEmployeeByPage(page, size, employee,beginDateScope);
+        return employeeService.getAuthingEmployeeByPage(page, size, employee,beginDateScope);
     }
 
     @PostMapping("/")
     public RespBean addEmp(@RequestBody Employee employee) {
-        if (employeeService.addEmp(employee) == 1) {
-            return RespBean.ok("添加成功!");
-        }
-        return RespBean.error("添加失败!");
+        return employeeService.addAuthEmp(employee);
     }
 
     @DeleteMapping("/{id}")
-    public RespBean deleteEmpByEid(@PathVariable Integer id) {
-        if (employeeService.deleteEmpByEid(id) == 1) {
-            return RespBean.ok("删除成功!");
-        }
-        return RespBean.error("删除失败!");
+    public RespBean deleteAuthEmpByEid(@PathVariable String id) {
+        return employeeService.deleteAuthEmpByEid(id);
     }
 
     @PutMapping("/")
     public RespBean updateEmp(@RequestBody Employee employee) {
-        if (employeeService.updateEmp(employee) == 1) {
-            return RespBean.ok("更新成功!");
-        }
-        return RespBean.error("更新失败!");
+        return employeeService.updateAuthEmp(employee);
     }
 
     @GetMapping("/nations")
@@ -94,8 +86,8 @@ public class EmpBasicController {
     }
 
     @GetMapping("/deps")
-    public List<Department> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public List<Department> getAllAutDepartments() {
+        return departmentService.getAuthingDepartments();
     }
 
     @GetMapping("/export")

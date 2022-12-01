@@ -1,7 +1,10 @@
 package org.javaboy.vhr.config;
 
+import cn.authing.sdk.java.client.AuthenticationClient;
 import cn.authing.sdk.java.util.JsonUtils;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javaboy.vhr.model.CurrentUserAccessToken;
 import org.javaboy.vhr.model.Hr;
 import org.javaboy.vhr.model.RespBean;
 import org.javaboy.vhr.service.HrService;
@@ -46,6 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CustomFilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource;
     @Autowired
     CustomUrlDecisionManager customUrlDecisionManager;
+    @Autowired
+    AuthenticationClient authenticationClient;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -61,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         MyAuthenticationProvider myAuthenticationProvider = new MyAuthenticationProvider();
         //设置passorderEncoder
         myAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        //设置UserDetailsService 可以参考第一篇登录使用例子自定义userDetailServices
+        //设置UserDetailsService
         myAuthenticationProvider.setUserDetailsService(hrService);
         return myAuthenticationProvider;
     }
@@ -73,12 +78,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(myAuthenticationProvider());
     }
 
-//    /**
-//     * 重写父类自定义AuthenticationManager 将provider注入进去
-//     * 当然我们也可以考虑不重写 在父类的manager里面注入provider
-//     * @return
-//     * @throws Exception
-//     */
+    /**
+     * 重写父类自定义AuthenticationManager 将provider注入进去
+     * 当然我们也可以考虑不重写 在父类的manager里面注入provider
+     * @return
+     */
     @Override
     protected AuthenticationManager authenticationManager(){
         ProviderManager manager = new ProviderManager(Arrays.asList(myAuthenticationProvider()));
@@ -95,19 +99,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     LoginFilter loginFilter() throws Exception {
         LoginFilter loginFilter = new LoginFilter();
         loginFilter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-                    response.setContentType("application/json;charset=utf-8");
-                    PrintWriter out = response.getWriter();
-                    // 获取 loadUserByUserName 中返回的 hr 对象，返回给前端
-                    Hr hr = (Hr) authentication.getPrincipal();
-                    hr.setPassword(null);
-//                    System.out.println("hr:"+ JsonUtils.serialize(hr));
-//                    System.out.println("hrRoles:"+ JsonUtils.serialize(hr.getRoles()));
-                    RespBean ok = RespBean.ok("登录成功!", hr);
-                    String s = new ObjectMapper().writeValueAsString(ok);
-                    out.write(s);
-                    out.flush();
-                    out.close();
-                }
+            response.setContentType("application/json;charset=utf-8");
+            PrintWriter out = response.getWriter();
+            // 获取 loadUserByUserName 中返回的 hr 对象，返回给前端
+            Hr hr = (Hr) authentication.getPrincipal();
+            hr.setPassword(null);
+            // 获取 ThreadLocal 中的 accessToken
+            hr.setAccessToken(CurrentUserAccessToken.getAccessToken());
+            RespBean ok = RespBean.ok("登录成功!", hr);
+            String s = new ObjectMapper().writeValueAsString(ok);
+            out.write(s);
+            out.flush();
+            out.close();
+            // 清除 ThreadLocal 中的 accessToken
+            CurrentUserAccessToken.removeAccessToken();
+            }
         );
         loginFilter.setAuthenticationFailureHandler((request, response, exception) -> {
                     response.setContentType("application/json;charset=utf-8");
@@ -160,8 +166,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .deleteCookies()
+                .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler((req, resp, authentication) -> {
+                            // 添加自定义逻辑，撤销 authing accessToken
+                            if(StrUtil.isNotBlank(req.getParameter("accessToken"))) {
+                                authenticationClient.revokeToken(req.getParameter("accessToken"));
+                            }
                             resp.setContentType("application/json;charset=utf-8");
                             PrintWriter out = resp.getWriter();
                             out.write(new ObjectMapper().writeValueAsString(RespBean.ok("注销成功!")));

@@ -1,6 +1,7 @@
 package com.example.yin2.service;
 
 import com.example.yin2.domain.Consumer;
+import com.example.yin2.domain.UserRoleParam;
 
 import java.util.List;
 
@@ -25,5 +26,7 @@ public interface ConsumerService {
     List<Consumer> userOfId(Integer id);
 
     List<Consumer> loginStatus(String username);
+
+    boolean changeRole(UserRoleParam param);
 
 }

@@ -18,4 +18,5 @@ public interface NationMapper {
     int updateByPrimaryKey(Nation record);
 
     List<Nation> getAllNations();
+
 }

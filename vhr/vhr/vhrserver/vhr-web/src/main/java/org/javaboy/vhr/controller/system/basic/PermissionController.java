@@ -1,8 +1,10 @@
 package org.javaboy.vhr.controller.system.basic;
 
+import cn.hutool.core.util.StrUtil;
 import org.javaboy.vhr.model.Menu;
 import org.javaboy.vhr.model.RespBean;
 import org.javaboy.vhr.model.Role;
+import org.javaboy.vhr.model.UpdateAuthResDto;
 import org.javaboy.vhr.service.MenuService;
 import org.javaboy.vhr.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,8 @@ import java.util.List;
  * @时间 2019-10-01 19:41
  */
 @RestController
-@RequestMapping("/system/basic/permiss")
-public class PermissController {
+@RequestMapping("/system/basic/permission")
+public class PermissionController {
     @Autowired
     RoleService roleService;
     @Autowired
@@ -35,32 +37,31 @@ public class PermissController {
         return menuService.getAllMenus();
     }
 
-    @GetMapping("/mids/{rid}")
-    public List<Integer> getMidsByRid(@PathVariable Integer rid) {
-        return menuService.getMidsByRid(rid);
+    @GetMapping("/mids/{roleName}")
+    public List<Integer> getMidsByRoleName(@PathVariable String roleName) {
+        return menuService.getMidsByRoleName(roleName);
     }
 
-    @PutMapping("/")
-    public RespBean updateMenuRole(Integer rid, Integer[] mids) {
-        if (menuService.updateMenuRole(rid, mids)) {
-            return RespBean.ok("更新成功!");
-        }
-        return RespBean.error("更新失败!");
+    @PostMapping("/")
+    public RespBean updateMenuRole(@RequestBody UpdateAuthResDto updateAuthResDto) {
+//        if (menuService.updateMenuRole(updateAuthResDto)) {
+//            return RespBean.ok("更新成功!");
+//        }
+//        return RespBean.error("更新失败!");
+        // TODO
+        return RespBean.error("Authing 暂未开放相关 API!");
     }
 
     @PostMapping("/role")
     public RespBean addRole(@RequestBody Role role) {
-        if (roleService.addRole(role) == 1) {
-            return RespBean.ok("添加成功!");
-        }
-        return RespBean.error("添加失败!");
+        return roleService.addAuthingRole(role);
     }
 
-    @DeleteMapping("/role/{rid}")
-    public RespBean deleteRoleById(@PathVariable Integer rid) {
-        if (roleService.deleteRoleById(rid) == 1) {
-            return RespBean.ok("删除成功!");
+    @DeleteMapping("/role/{roleName}")
+    public RespBean deleteRoleByName(@PathVariable String roleName) {
+        if(StrUtil.equals("ROLE_superAdmin",roleName)){
+            return RespBean.error("不允许删除超级管理员角色!");
         }
-        return RespBean.error("删除失败!");
+        return roleService.deleteRoleByName(roleName);
     }
 }

@@ -22,9 +22,9 @@ import java.util.List;
  * @博客 http://wangsong.blog.csdn.net
  * @网站 http://www.javaboy.org
  * @时间 2019-09-29 7:37
- *
- * 这个类的作用，主要是根据用户传来的请求地址，分析出请求需要的角色
+ * 根据用户传来的请求地址，分析出请求需要的角色
  */
+
 @Component
 public class CustomFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
     @Autowired
@@ -32,18 +32,20 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
     AntPathMatcher antPathMatcher = new AntPathMatcher();
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
+        // 获取请求 url
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
-        List<Menu> menus = menuService.getAllMenusWithRole();
+        List<Menu> menus = menuService.getMenus();
+        Integer targetMenuId = 0;
         for (Menu menu : menus) {
             if (antPathMatcher.match(menu.getUrl(), requestUrl)) {
-                List<Role> roles = menu.getRoles();
-                String[] str = new String[roles.size()];
-                for (int i = 0; i < roles.size(); i++) {
-                    str[i] = roles.get(i).getName();
-                }
-                return SecurityConfig.createList(str);
+                targetMenuId = menu.getId();
             }
         }
+        List<String> authorizedRoles = menuService.selectAuthorizedRoles(targetMenuId);
+        if(authorizedRoles.size() != 0) {
+            return SecurityConfig.createList(authorizedRoles.toArray(new String[authorizedRoles.size()]));
+        }
+        // 数据库中不存在的角色，用于表示不匹配上面逻辑的路径需要登录后访问
         return SecurityConfig.createList("ROLE_LOGIN");
     }
 

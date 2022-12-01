@@ -6,9 +6,9 @@
                 <div>
                     <el-button icon="el-icon-bell" type="text" style="margin-right: 8px;color: #000000;" size="normal" @click="goChat"></el-button>
                     <el-dropdown class="userInfo" @command="commandHandler">
-  <span class="el-dropdown-link">
-    {{user.name}}<i><img :src="user.userface" alt=""></i>
-  </span>
+                    <span class="el-dropdown-link">
+                        {{user.name}}<i><img :src="user.userface" alt=""></i>
+                    </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item command="userinfo">个人中心</el-dropdown-item>
                             <el-dropdown-item command="setting">设置</el-dropdown-item>
@@ -73,7 +73,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        this.getRequest("/logout");
+                        this.getRequest("/logout?accessToken="+this.$store.state.currentHr.accessToken);
                         window.sessionStorage.removeItem("user")
                         this.$store.commit('initRoutes', []);
                         this.$router.replace("/");

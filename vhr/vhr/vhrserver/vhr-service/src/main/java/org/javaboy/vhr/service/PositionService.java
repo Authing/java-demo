@@ -26,6 +26,10 @@ public class PositionService {
         return positionMapper.getAllPositions();
     }
 
+    public Position getPositionById(Integer id){
+        return positionMapper.selectByPrimaryKey(id);
+    }
+
     public Integer addPosition(Position position) {
         position.setEnabled(true);
         position.setCreateDate(new Date());

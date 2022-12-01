@@ -24,8 +24,11 @@ import java.util.Collection;
 public class CustomUrlDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
+        // configAttributes 中的内容来自 CustomFilterInvocationSecurityMetadataSource 的 getAttributes()
         for (ConfigAttribute configAttribute : configAttributes) {
+            // 当前请求需要的权限
             String needRole = configAttribute.getAttribute();
+            // 对于自定义的角色特殊处理
             if ("ROLE_LOGIN".equals(needRole)) {
                 if (authentication instanceof AnonymousAuthenticationToken) {
                     throw new AccessDeniedException("尚未登录，请登录!");
@@ -33,6 +36,7 @@ public class CustomUrlDecisionManager implements AccessDecisionManager {
                     return;
                 }
             }
+            // 当前用户具有的角色，从 hr.getAuthorities() 获取
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             for (GrantedAuthority authority : authorities) {
                 if (authority.getAuthority().equals(needRole)) {

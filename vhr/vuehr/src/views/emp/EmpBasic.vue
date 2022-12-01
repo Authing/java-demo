@@ -98,7 +98,7 @@
                         </el-col>
                     </el-row>
                     <el-row style="margin-top: 10px">
-                        <el-col :span="5">
+                        <!-- <el-col :span="5">
                             所属部门:
                             <el-popover
                                     placement="right"
@@ -113,7 +113,7 @@
                                      @click="showDepView2">{{inputDepName}}
                                 </div>
                             </el-popover>
-                        </el-col>
+                        </el-col> -->
                         <el-col :span="10">
                             入职日期:
                             <el-date-picker
@@ -128,7 +128,7 @@
                             </el-date-picker>
                         </el-col>
                         <el-col :span="5" :offset="4">
-                            <el-button size="mini">取消</el-button>
+                            <el-button size="mini" @click="clearSearchValue">清空</el-button>
                             <el-button size="mini" icon="el-icon-search" type="primary" @click="initEmps('advanced')">搜索</el-button>
                         </el-col>
                     </el-row>
@@ -199,7 +199,7 @@
                         prop="politicsstatus.name"
                         label="政治面貌">
                 </el-table-column>
-                <el-table-column
+                <!-- <el-table-column
                         prop="email"
                         width="180"
                         align="left"
@@ -210,7 +210,7 @@
                         width="100"
                         align="left"
                         label="电话号码">
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column
                         prop="address"
                         width="220"
@@ -307,6 +307,8 @@
                         background
                         @current-change="currentChange"
                         @size-change="sizeChange"
+                        :page-sizes="[10, 20, 30, 40, 50]"
+                        :page-size="10"
                         layout="sizes, prev, pager, next, jumper, ->, total, slot"
                         :total="total">
                 </el-pagination>
@@ -377,12 +379,12 @@
                                           v-model="emp.nativePlace" placeholder="请输入籍贯"></el-input>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="6">
+                        <!-- <el-col :span="6">
                             <el-form-item label="电子邮箱:" prop="email">
                                 <el-input size="mini" style="width: 150px" prefix-icon="el-icon-message"
                                           v-model="emp.email" placeholder="请输入电子邮箱"></el-input>
                             </el-form-item>
-                        </el-col>
+                        </el-col> -->
                         <el-col :span="7">
                             <el-form-item label="联系地址:" prop="address">
                                 <el-input size="mini" style="width: 200px" prefix-icon="el-icon-edit"
@@ -416,7 +418,7 @@
                             </el-form-item>
                         </el-col>
                         <el-col :span="6">
-                            <el-form-item label="所属部门:" prop="departmentId">
+                            <el-form-item label="所属部门:" prop="authingDepartmentId">
                                 <el-popover
                                         placement="right"
                                         title="请选择部门"
@@ -432,10 +434,16 @@
                                 </el-popover>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="7">
+                        <!-- <el-col :span="7">
                             <el-form-item label="电话号码:" prop="phone">
                                 <el-input size="mini" style="width: 200px" prefix-icon="el-icon-phone"
                                           v-model="emp.phone" placeholder="电话号码"></el-input>
+                            </el-form-item>
+                        </el-col> -->
+                        <el-col :span="7">
+                            <el-form-item label="externalId:" prop="id">
+                                <el-input size="mini" style="width: 200px" prefix-icon="el-icon-phone"
+                                          v-model="emp.id" placeholder="原系统id"></el-input>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -568,7 +576,7 @@
                     jobLevelId: null,
                     posId: null,
                     engageForm: null,
-                    departmentId: null,
+                    authingDepartmentId: null,
                     beginDateScope: null
                 },
                 title: '',
@@ -609,6 +617,7 @@
                 }],
                 inputDepName: '所属部门',
                 emp: {
+                    id:"",
                     name: "javaboy",
                     gender: "男",
                     birthday: "1989-12-31",
@@ -620,7 +629,7 @@
                     email: "laowang@qq.com",
                     phone: "18565558897",
                     address: "深圳市南山区",
-                    departmentId: null,
+                    authingDepartmentId: null,
                     jobLevelId: 9,
                     posId: 29,
                     engageForm: "劳务合同",
@@ -642,6 +651,7 @@
                     label: 'name'
                 },
                 rules: {
+                    id: [{required: true, message: '请输入原系统id(整数)', trigger: 'blur', pattern: /^[+]?(0|([1-9]\d*))?$/,}],
                     name: [{required: true, message: '请输入用户名', trigger: 'blur'}],
                     gender: [{required: true, message: '请输入性别', trigger: 'blur'}],
                     birthday: [{required: true, message: '请输入出生日期', trigger: 'blur'}],
@@ -654,14 +664,14 @@
                     nationId: [{required: true, message: '请输入您组', trigger: 'blur'}],
                     nativePlace: [{required: true, message: '请输入籍贯', trigger: 'blur'}],
                     politicId: [{required: true, message: '请输入政治面貌', trigger: 'blur'}],
-                    email: [{required: true, message: '请输入邮箱地址', trigger: 'blur'}, {
-                        type: 'email',
-                        message: '邮箱格式不正确',
-                        trigger: 'blur'
-                    }],
-                    phone: [{required: true, message: '请输入电话号码', trigger: 'blur'}],
+                    // email: [{required: true, message: '请输入邮箱地址', trigger: 'blur'}, {
+                    //     type: 'email',
+                    //     message: '邮箱格式不正确',
+                    //     trigger: 'blur'
+                    // }],
+                    // phone: [{required: true, message: '请输入电话号码', trigger: 'blur'}],
                     address: [{required: true, message: '请输入员工地址', trigger: 'blur'}],
-                    departmentId: [{required: true, message: '请输入部门名称', trigger: 'blur'}],
+                    authingDepartmentId: [{required: true, message: '请输入部门名称', trigger: 'blur'}],
                     jobLevelId: [{required: true, message: '请输入职称', trigger: 'blur'}],
                     posId: [{required: true, message: '请输入职位', trigger: 'blur'}],
                     engageForm: [{required: true, message: '请输入聘用形式', trigger: 'blur'}],
@@ -688,7 +698,7 @@
         methods: {
             searvhViewHandleNodeClick(data) {
                 this.inputDepName = data.name;
-                this.searchValue.departmentId = data.id;
+                this.searchValue.authingDepartmentId = data.authingDepartmentId;
                 this.popVisible2 = !this.popVisible2
             },
             onError(err, file, fileList) {
@@ -712,6 +722,7 @@
             },
             emptyEmp() {
                 this.emp = {
+                    id:"",
                     name: "",
                     gender: "",
                     birthday: "",
@@ -723,7 +734,7 @@
                     email: "",
                     phone: "",
                     address: "",
-                    departmentId: null,
+                    authingDepartmentId: null,
                     jobLevelId: 9,
                     posId: 29,
                     engageForm: "",
@@ -742,6 +753,7 @@
                 this.inputDepName = '';
             },
             showEditEmpView(data) {
+                console.log("data:",data);
                 this.initPositions();
                 this.title = '编辑员工信息';
                 this.emp = data;
@@ -749,12 +761,13 @@
                 this.dialogVisible = true;
             },
             deleteEmp(data) {
+                console.log("data:",data)
                 this.$confirm('此操作将永久删除【' + data.name + '】, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.deleteRequest("/employee/basic/" + data.id).then(resp => {
+                    this.deleteRequest("/employee/basic/" + data.ownerId).then(resp => {
                         if (resp) {
                             this.initEmps();
                         }
@@ -767,7 +780,7 @@
                 });
             },
             doAddEmp() {
-                if (this.emp.id) {
+                if (this.emp.ownerId) {
                     this.$refs['empForm'].validate(valid => {
                         if (valid) {
                             this.putRequest("/employee/basic/", this.emp).then(resp => {
@@ -793,7 +806,7 @@
             },
             handleNodeClick(data) {
                 this.inputDepName = data.name;
-                this.emp.departmentId = data.id;
+                this.emp.authingDepartmentId = data.authingDepartmentId;
                 this.popVisible = !this.popVisible
             },
             showDepView() {
@@ -851,11 +864,13 @@
                     this.getRequest('/employee/basic/deps').then(resp => {
                         if (resp) {
                             this.allDeps = resp;
+                            console.log("resp:",this.allDeps)
                             window.sessionStorage.setItem("deps", JSON.stringify(resp));
                         }
                     })
                 } else {
                     this.allDeps = JSON.parse(window.sessionStorage.getItem("deps"));
+                    console.log("resp:",this.allDeps)
                 }
             },
             sizeChange(currentSize) {
@@ -891,8 +906,8 @@
                     if (this.searchValue.engageForm) {
                         url += '&engageForm=' + this.searchValue.engageForm;
                     }
-                    if (this.searchValue.departmentId) {
-                        url += '&departmentId=' + this.searchValue.departmentId;
+                    if (this.searchValue.authingDepartmentId) {
+                        url += '&authingDepartmentId=' + this.searchValue.authingDepartmentId;
                     }
                     if (this.searchValue.beginDateScope) {
                         url += '&beginDateScope=' + this.searchValue.beginDateScope;
@@ -901,12 +916,22 @@
                     url += "&name=" + this.keyword;
                 }
                 this.getRequest(url).then(resp => {
+                    console.log("emps:",resp)
                     this.loading = false;
                     if (resp) {
                         this.emps = resp.data;
                         this.total = resp.total;
                     }
                 });
+            },
+            clearSearchValue(){
+                this.searchValue.politicId = null
+                this.searchValue.nationId = null
+                this.searchValue.jobLevelId = null
+                this.searchValue.posId = null
+                this.searchValue.engageForm = null
+                this.searchValue.authingDepartmentId = null
+                this.searchValue.beginDateScope = null
             }
         }
     }

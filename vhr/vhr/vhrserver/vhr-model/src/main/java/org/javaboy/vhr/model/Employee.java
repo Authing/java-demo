@@ -8,48 +8,12 @@ import java.util.Date;
 public class Employee implements Serializable {
     private Integer id;
 
+    // 对应 authing userId
+    private String ownerId;
+
     private String name;
 
     private String gender;
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", gender='" + gender + '\'' +
-                ", birthday=" + birthday +
-                ", idCard='" + idCard + '\'' +
-                ", wedlock='" + wedlock + '\'' +
-                ", nationId=" + nationId +
-                ", nativePlace='" + nativePlace + '\'' +
-                ", politicId=" + politicId +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", departmentId=" + departmentId +
-                ", jobLevelId=" + jobLevelId +
-                ", posId=" + posId +
-                ", engageForm='" + engageForm + '\'' +
-                ", tiptopDegree='" + tiptopDegree + '\'' +
-                ", specialty='" + specialty + '\'' +
-                ", school='" + school + '\'' +
-                ", beginDate=" + beginDate +
-                ", workState='" + workState + '\'' +
-                ", workID='" + workID + '\'' +
-                ", contractTerm=" + contractTerm +
-                ", conversionTime=" + conversionTime +
-                ", notWorkDate=" + notWorkDate +
-                ", beginContract=" + beginContract +
-                ", endContract=" + endContract +
-                ", workAge=" + workAge +
-                ", nation=" + nation +
-                ", politicsstatus=" + politicsstatus +
-                ", department=" + department +
-                ", jobLevel=" + jobLevel +
-                ", position=" + position +
-                '}';
-    }
 
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "Asia/Shanghai")
     private Date birthday;
@@ -71,6 +35,8 @@ public class Employee implements Serializable {
     private String address;
 
     private Integer departmentId;
+
+    private String authingDepartmentId;
 
     private Integer jobLevelId;
 
@@ -382,5 +348,60 @@ public class Employee implements Serializable {
 
     public void setWorkAge(Integer workAge) {
         this.workAge = workAge;
+    }
+
+    public String getAuthingDepartmentId() {
+        return authingDepartmentId;
+    }
+
+    public void setAuthingDepartmentId(String authingDepartmentId) {
+        this.authingDepartmentId = authingDepartmentId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
+                ", idCard='" + idCard + '\'' +
+                ", wedlock='" + wedlock + '\'' +
+                ", nationId=" + nationId +
+                ", nativePlace='" + nativePlace + '\'' +
+                ", politicId=" + politicId +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", address='" + address + '\'' +
+                ", departmentId=" + departmentId +
+                ", jobLevelId=" + jobLevelId +
+                ", posId=" + posId +
+                ", engageForm='" + engageForm + '\'' +
+                ", tiptopDegree='" + tiptopDegree + '\'' +
+                ", specialty='" + specialty + '\'' +
+                ", school='" + school + '\'' +
+                ", beginDate=" + beginDate +
+                ", workState='" + workState + '\'' +
+                ", workID='" + workID + '\'' +
+                ", contractTerm=" + contractTerm +
+                ", conversionTime=" + conversionTime +
+                ", notWorkDate=" + notWorkDate +
+                ", beginContract=" + beginContract +
+                ", endContract=" + endContract +
+                ", workAge=" + workAge +
+                ", nation=" + nation +
+                ", politicsstatus=" + politicsstatus +
+                ", department=" + department +
+                ", jobLevel=" + jobLevel +
+                ", position=" + position +
+                '}';
     }
 }

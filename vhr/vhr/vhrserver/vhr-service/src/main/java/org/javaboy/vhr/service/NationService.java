@@ -23,4 +23,6 @@ public class NationService {
     public List<Nation> getAllNations() {
         return nationMapper.getAllNations();
     }
+
+    public Nation getNationById(Integer id){return nationMapper.selectByPrimaryKey(id); }
 }

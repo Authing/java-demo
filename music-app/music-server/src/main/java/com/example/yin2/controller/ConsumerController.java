@@ -165,7 +165,7 @@ public class ConsumerController {
      */
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public Object allUser() {
-        int page = 1, limit = 10;
+        int page = 1, limit = 50;
         List<UserDto> userList = new ArrayList<>();
         ListUsersRequestDto listUsersRequestDto = new ListUsersRequestDto();
         ListUsersOptionsDto optionsDto = new ListUsersOptionsDto();
@@ -407,51 +407,17 @@ public class ConsumerController {
      * 修改用户角色
      */
     @PostMapping("user/changeRole")
-    public Object changeRole(@RequestBody UserRoleParam param){
-        String userId = param.getUserId();
+    public Object changeRole(@RequestBody UserRoleParam param) {
         List<String> codeList = param.getCodeList();
         // 检查是否删除了 user 角色
-        if(!codeList.contains(RoleCodeEnum.USER.getValue())){
+        if (!codeList.contains(RoleCodeEnum.USER.getValue())) {
             return new ErrorMessage("不允许删除基本的 user 角色").getMessage();
         }
-        // 获取全部用户角色
-        ListRolesDto listRolesDto = new ListRolesDto();
-        listRolesDto.setNamespace(AUTHING_APP_ID);
-        // 调用 authing 接口
-        RolePaginatedRespDto rolePaginatedRespDto = managementClient.listRoles(listRolesDto);
-        List<RoleDto> roleDtoList = rolePaginatedRespDto.getData().getList();
-        // 设置清空和添加的共同目标 —— 用户
-        List<TargetDto> target = new ArrayList<>();
-        TargetDto targetDto = new TargetDto();
-        targetDto.setTargetType(TargetDto.TargetType.USER);
-        targetDto.setTargetIdentifier(userId);
-        target.add(targetDto);
-        // 清空该用户角色
-        for(RoleDto roleDto:roleDtoList){
-            RevokeRoleDto revokeRoleDto = new RevokeRoleDto();
-            revokeRoleDto.setTargets(target);
-            revokeRoleDto.setNamespace(AUTHING_APP_ID);
-            // code 不同
-            revokeRoleDto.setCode(roleDto.getCode());
-            // 调用 authing 接口
-            IsSuccessRespDto isSuccessRespDto = managementClient.revokeRole(revokeRoleDto);
-            if(isSuccessRespDto.getStatusCode() != 200){
-                return new ErrorMessage("修改角色失败").getMessage();
-            }
+        if (consumerService.changeRole(param)){
+            return new SuccessMessage<>("修改成功").getMessage();
+        }else{
+            return new ErrorMessage("修改角色失败").getMessage();
         }
-        // 添加角色
-        for(String code:codeList){
-            AssignRoleDto assignRoleDto = new AssignRoleDto();
-            assignRoleDto.setTargets(target);
-            assignRoleDto.setNamespace(AUTHING_APP_ID);
-            assignRoleDto.setCode(code);
-            // 调用 authing 接口
-            IsSuccessRespDto isSuccessRespDto = managementClient.assignRole(assignRoleDto);
-            if(isSuccessRespDto.getStatusCode() != 200){
-                return new ErrorMessage("修改角色失败").getMessage();
-            }
-        }
-        return new SuccessMessage<>("修改成功").getMessage();
     }
 
     /**

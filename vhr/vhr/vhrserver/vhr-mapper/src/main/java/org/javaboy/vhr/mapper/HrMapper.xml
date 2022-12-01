@@ -26,15 +26,6 @@
     <select id="getAllHrsExceptCurrentHr" resultMap="BaseResultMap">
         select * from hr where id !=#{id};
     </select>
-    <select id="getAllHrs" resultMap="HrWithRoles">
-        select hr.id, hr.name, hr.phone, hr.telephone, hr.address, hr.enabled, hr.username, hr.userface,
-        hr.remark,r.`id` as rid,r.`name` as rname,r.`nameZh` as rnameZh from hr left join hr_role hrr on
-        hr.`id`=hrr.`hrid` left join role r on hrr.`rid`=r.`id` where hr.`id`!=#{hrid}
-        <if test="keywords!=null">
-            and hr.name like concat('%',#{keywords},'%')
-        </if>
-        order by hr.id
-    </select>
     <select id="getHrRolesById" resultType="org.javaboy.vhr.model.Role">
     select r.* from role r,hr_role hrr where hrr.`rid`=r.`id` and hrr.`hrid`=#{id}
   </select>

@@ -26,6 +26,10 @@ public class JobLevelService {
         return jobLevelMapper.getAllJobLevels();
     }
 
+    public JobLevel getJobLevelById(Integer id){
+        return jobLevelMapper.selectByPrimaryKey(id);
+    }
+
     public Integer addJobLevel(JobLevel jobLevel) {
         jobLevel.setCreateDate(new Date());
         jobLevel.setEnabled(true);

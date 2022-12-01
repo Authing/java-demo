@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class Hr implements UserDetails {
-    // TODO 不需要
     private Integer id;
 
     private String name;
@@ -32,13 +31,14 @@ public class Hr implements UserDetails {
 
     private String remark;
 
-    // 不需要
     private List<Role> roles;
 
     // 对应 authing userId
     private String ownerId;
 
-    // 获取当前用户所具有的角色
+    private String accessToken;
+
+    // 当前用户的角色赋值
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -175,5 +175,13 @@ public class Hr implements UserDetails {
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }

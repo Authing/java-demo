@@ -4,9 +4,7 @@ import org.javaboy.vhr.model.Menu;
 import org.javaboy.vhr.model.RespBean;
 import org.javaboy.vhr.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,8 +22,8 @@ import java.util.List;
 public class SystemConfigController {
     @Autowired
     MenuService menuService;
-    @GetMapping("/menu")
-    public List<Menu> getMenusByHrId() {
-        return menuService.getMenusByHrId();
+    @PostMapping("/menu")
+    public List<Menu> getMenusByAccessToken(@RequestBody String accessToken) {
+        return menuService.getMenusByAccessToken(accessToken);
     }
 }

@@ -9,9 +9,6 @@
   <sql id="Base_Column_List" >
     id, name, nameZh
   </sql>
-  <select id="getAllRoles" resultMap="BaseResultMap">
-    select * from role;
-  </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />

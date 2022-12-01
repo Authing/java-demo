@@ -56,9 +56,9 @@
                 </table>
             </div>
             <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="doAddDep">确 定</el-button>
-  </span>
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="doAddDep">确 定</el-button>
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -72,7 +72,8 @@
                 filterText: '',
                 dep: {
                     name: '',
-                    parentId: -1
+                    parentId: -1,
+                    parentAuthingId: ''
                 },
                 pname: '',
                 deps: [],
@@ -94,14 +95,15 @@
             initDep() {
                 this.dep = {
                     name: '',
-                    parentId: -1
+                    parentId: -1,
+                    parentAuthingId: ''
                 }
                 this.pname = '';
             },
             addDep2Deps(deps, dep) {
                 for (let i = 0; i < deps.length; i++) {
                     let d = deps[i];
-                    if (d.id == dep.parentId) {
+                    if (d.authingDepId == dep.parentAuthingId) {
                         d.children = d.children.concat(dep);
                         if (d.children.length > 0) {
                             d.parent = true;
@@ -116,38 +118,40 @@
                 this.postRequest("/system/basic/department/", this.dep).then(resp => {
                     if (resp) {
                         this.addDep2Deps(this.deps, resp.obj);
+                        this.initDeps();
                         this.dialogVisible = false;
                         //初始化变量
                         this.initDep();
                     }
                 })
             },
-            removeDepFromDeps(p,deps, id) {
+            removeDepFromDeps(p,deps,authingDepId) {
                 for(let i=0;i<deps.length;i++){
                     let d = deps[i];
-                    if (d.id == id) {
+                    if (d.authingDepId == authingDepId) {
                         deps.splice(i, 1);
                         if (deps.length == 0) {
                             p.parent = false;
                         }
                         return;
                     }else{
-                        this.removeDepFromDeps(d,d.children, id);
+                        this.removeDepFromDeps(d,d.children,authingDepId);
                     }
                 }
             },
             deleteDep(data) {
                 if (data.parent) {
-                    this.$message.error("父部门删除失败");
+                    this.$message.error("父部门删除失败,必须要先删除所有的子部门");
                 } else {
                     this.$confirm('此操作将永久删除【' + data.name + '】部门, 是否继续?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                       this.deleteRequest("/system/basic/department/"+data.id).then(resp=>{
+                       this.deleteRequest("/system/basic/department/"+data.authingDepId).then(resp=>{
                            if (resp) {
-                               this.removeDepFromDeps(null,this.deps,data.id);
+                                this.removeDepFromDeps(null,this.deps,data.authingDepId);
+                                this.initDeps();
                            }
                        })
                     }).catch(() => {
@@ -161,10 +165,12 @@
             showAddDepView(data) {
                 this.pname = data.name;
                 this.dep.parentId = data.id;
+                this.dep.parentAuthingId = data.authingDepId;
                 this.dialogVisible = true;
             },
             initDeps() {
                 this.getRequest("/system/basic/department/").then(resp => {
+                    console.log("resp:",resp)
                     if (resp) {
                         this.deps = resp;
                     }

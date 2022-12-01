@@ -25,13 +25,13 @@ app.config.globalProperties.cookies = VueCookies;
 app.use(
   createGuard({
     //todo
-    appId: "AUTHING_APP_ID",
+    appId: "634521175dc75ced7033ccdb",
     // 如果你使用的是私有化部署的 Authing 服务，需要传入自定义 host，如:
-    host: 'AUTHING_APP_HOST',
+    host: 'https://kuluqi3.authing.cn',
 
     // 默认情况下，会使用你在 Authing 控制台中配置的第一个回调地址为此次认证使用的回调地址。
     // 如果你配置了多个回调地址，也可以手动指定（此地址也需要加入到应用的「登录回调 URL」中）：
-    redirectUri: "AUTHING_REDIRECT_URI",
+    redirectUri: "http://127.0.0.1:8080/callback",
     // mode: "normal",
   })
 );

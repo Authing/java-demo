@@ -8,7 +8,7 @@
         <div class="hr-container">
             <el-card class="hr-card" v-for="(hr,index) in hrs" :key="index">
                 <div slot="header" class="clearfix">
-                    <span>{{hr.name}}</span>
+                    <span>{{hr.username}}</span>
                     <el-button style="float: right; padding: 3px 0;color: #e30007;" type="text"
                                icon="el-icon-delete" @click="deleteHr(hr)"></el-button>
                 </div>
@@ -17,7 +17,7 @@
                         <img :src="hr.userface" :alt="hr.name" :title="hr.name" class="userface-img">
                     </div>
                     <div class="userinfo-container">
-                        <div>用户名：{{hr.name}}</div>
+                        <div>用户名：{{hr.username}}</div>
                         <div>手机号码：{{hr.phone}}</div>
                         <div>电话号码：{{hr.telephone}}</div>
                         <div>地址：{{hr.address}}</div>
@@ -32,8 +32,8 @@
                             </el-switch>
                         </div>
                         <div>用户角色：
-                            <el-tag type="success" style="margin-right: 4px" v-for="(role,indexj) in hr.roles"
-                                    :key="indexj">{{role.nameZh}}
+                            <el-tag type="success" style="margin-right: 4px" v-for="(role) in hr.roles"
+                                    :key="role.name">{{role.nameZh}}
                             </el-tag>
                             <el-popover
                                     placement="right"
@@ -44,10 +44,10 @@
                                     trigger="click">
                                 <el-select v-model="selectedRoles" multiple placeholder="请选择">
                                     <el-option
-                                            v-for="(r,indexk) in allroles"
-                                            :key="indexk"
+                                            v-for="(r) in allroles"
+                                            :key="r.name"
                                             :label="r.nameZh"
-                                            :value="r.id">
+                                            :value="r.name">
                                     </el-option>
                                 </el-select>
                                 <el-button slot="reference" icon="el-icon-more" type="text"></el-button>
@@ -70,7 +70,7 @@
                 keywords: '',
                 hrs: [],
                 selectedRoles: [],
-                allroles: []
+                allroles: [],
             }
         },
         mounted() {
@@ -83,7 +83,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.deleteRequest("/system/hr/"+hr.id).then(resp=>{
+                    this.deleteRequest("/system/hr/"+hr.ownerId).then(resp=>{
                         if (resp) {
                             this.initHrs();
                         }
@@ -102,6 +102,7 @@
                 let roles = [];
                 Object.assign(roles, hr.roles);
                 let flag = false;
+                // 比较用户拥有角色和选定项有无区别
                 if (roles.length != this.selectedRoles.length) {
                     flag = true;
                 } else {
@@ -109,7 +110,7 @@
                         let role = roles[i];
                         for (let j = 0; j < this.selectedRoles.length; j++) {
                             let sr = this.selectedRoles[j];
-                            if (role.id == sr) {
+                            if (role.name == sr) {
                                 roles.splice(i, 1);
                                 i--;
                                 break;
@@ -120,12 +121,17 @@
                         flag = true;
                     }
                 }
+                // 修改角色
                 if (flag) {
-                    let url = '/system/hr/role?hrid=' + hr.id;
+                    let updateHrRoleDto = {}
+                    // 修改为 authing 接口需要的参数
+                    updateHrRoleDto.authingUserId = hr.ownerId
+                    updateHrRoleDto.roleCodes = []
+                    let url = '/system/hr/role'
                     this.selectedRoles.forEach(sr => {
-                        url += '&rids=' + sr;
+                        updateHrRoleDto.roleCodes.push(sr)
                     });
-                    this.putRequest(url).then(resp => {
+                    this.postRequest(url,updateHrRoleDto).then(resp => {
                         if (resp) {
                             this.initHrs();
                         }
@@ -137,12 +143,12 @@
                 let roles = hr.roles;
                 this.selectedRoles = [];
                 roles.forEach(r => {
-                    this.selectedRoles.push(r.id);
+                    this.selectedRoles.push(r.name);
                 })
             },
             enabledChange(hr) {
                 delete hr.roles;
-                this.putRequest("/system/hr/", hr).then(resp => {
+                this.putRequest("/system/hr/status", hr).then(resp => {
                     if (resp) {
                         this.initHrs();
                     }
@@ -156,7 +162,7 @@
                 })
             },
             initHrs() {
-                this.getRequest("/system/hr/?keywords="+this.keywords).then(resp => {
+                this.getRequest("/system/hr/search?keywords="+this.keywords).then(resp => {
                     if (resp) {
                         this.hrs = resp;
                     }
