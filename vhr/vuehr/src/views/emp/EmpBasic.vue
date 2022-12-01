@@ -753,7 +753,6 @@
                 this.inputDepName = '';
             },
             showEditEmpView(data) {
-                console.log("data:",data);
                 this.initPositions();
                 this.title = '编辑员工信息';
                 this.emp = data;
@@ -761,7 +760,6 @@
                 this.dialogVisible = true;
             },
             deleteEmp(data) {
-                console.log("data:",data)
                 this.$confirm('此操作将永久删除【' + data.name + '】, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -864,13 +862,11 @@
                     this.getRequest('/employee/basic/deps').then(resp => {
                         if (resp) {
                             this.allDeps = resp;
-                            console.log("resp:",this.allDeps)
                             window.sessionStorage.setItem("deps", JSON.stringify(resp));
                         }
                     })
                 } else {
                     this.allDeps = JSON.parse(window.sessionStorage.getItem("deps"));
-                    console.log("resp:",this.allDeps)
                 }
             },
             sizeChange(currentSize) {
@@ -916,7 +912,6 @@
                     url += "&name=" + this.keyword;
                 }
                 this.getRequest(url).then(resp => {
-                    console.log("emps:",resp)
                     this.loading = false;
                     if (resp) {
                         this.emps = resp.data;

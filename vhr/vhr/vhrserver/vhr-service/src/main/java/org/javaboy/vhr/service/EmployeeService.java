@@ -67,6 +67,10 @@ public class EmployeeService {
         optionsDto.setWithCustomData(true);
         PaginationDto paginationDto = new PaginationDto();
         paginationDto.setPage(page);
+        // authing 分页每页最多 50 条数据
+        if(limit > 50){
+            return new RespPageBean();
+        }
         paginationDto.setLimit(limit);
         optionsDto.setPagination(paginationDto);
         reqDto.setOptions(optionsDto);

@@ -52,17 +52,6 @@ public class selfTest {
     @Test
     public void testMag(){
         ListUsersRequestDto listUsersRequestDto = new ListUsersRequestDto();
-        listUsersRequestDto.setKeywords("江南");
-        ListUsersOptionsDto listUsersOptionsDto = new ListUsersOptionsDto();
-        listUsersOptionsDto.setWithCustomData(true);
-        List<String> searchList = new ArrayList<>();
-        searchList.add("username");
-        listUsersOptionsDto.setFuzzySearchOn(searchList);
-        PaginationDto paginationDto = new PaginationDto();
-        paginationDto.setPage(1);
-        paginationDto.setLimit(20);
-        listUsersOptionsDto.setPagination(paginationDto);
-        listUsersRequestDto.setOptions(listUsersOptionsDto);
         UserPaginatedRespDto userPaginatedRespDto = managementClient.listUsers(listUsersRequestDto);
     }
 

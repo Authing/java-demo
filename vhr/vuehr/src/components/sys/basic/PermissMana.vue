@@ -126,7 +126,6 @@
                 })
             },
             change(rid) {
-                console.log("rid:",rid)
                 if (rid) {
                     this.initAllMenus();
                     this.initSelectedMenus(rid);
@@ -142,7 +141,6 @@
             },
             initAllMenus() {
                 this.getRequest("/system/basic/permission/menus").then(resp => {
-                    console.log("allMenus:",resp)
                     if (resp) {
                         this.allmenus = resp;
                     }

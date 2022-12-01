@@ -170,7 +170,6 @@
             },
             initDeps() {
                 this.getRequest("/system/basic/department/").then(resp => {
-                    console.log("resp:",resp)
                     if (resp) {
                         this.deps = resp;
                     }
