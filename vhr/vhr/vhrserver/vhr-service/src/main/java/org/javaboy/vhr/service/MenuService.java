@@ -4,12 +4,11 @@ import cn.authing.sdk.java.client.AuthenticationClient;
 import cn.authing.sdk.java.client.ManagementClient;
 import cn.authing.sdk.java.dto.*;
 import cn.authing.sdk.java.dto.authentication.UserInfo;
-import cn.authing.sdk.java.util.JsonUtils;
+import cn.hutool.core.util.StrUtil;
 import org.javaboy.vhr.mapper.MenuMapper;
 import org.javaboy.vhr.mapper.MenuRoleMapper;
 import org.javaboy.vhr.model.Hr;
 import org.javaboy.vhr.model.Menu;
-import org.javaboy.vhr.model.MenuRole;
 import org.javaboy.vhr.model.UpdateAuthResDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +41,7 @@ public class MenuService {
     @Autowired
     ManagementClient managementClient;
     @Value("${authing.config.appId}")
-    String AUTHING_APP_ID;
+    String namespace;
 
     public List<Menu> getMenusByHrId() {
         return menuMapper.getMenusByHrId(((Hr) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
@@ -85,17 +84,17 @@ public class MenuService {
     // 获取 authing 用户的授权资源列表
     public List<String> getAuthingUserResources(String authingUserId){
         GetUserRolesDto getUserRolesDto = new GetUserRolesDto();
-        getUserRolesDto.setNamespace(AUTHING_APP_ID);
+        getUserRolesDto.setNamespace(namespace);
         getUserRolesDto.setUserId(authingUserId);
         // 获取用户角色
         RolePaginatedRespDto userRoles = managementClient.getUserRoles(getUserRolesDto);
         List<RoleDto> roles = userRoles.getData().getList();
         // 用户允许访问的全部 menuId
         List<String> resources = new ArrayList<>();
-        roles.forEach((dto) -> {
+        roles.forEach((role) -> {
             GetRoleAuthorizedResourcesDto resourcesDto = new GetRoleAuthorizedResourcesDto();
-            resourcesDto.setNamespace(AUTHING_APP_ID);
-            resourcesDto.setCode(dto.getCode());
+            resourcesDto.setNamespace(namespace);
+            resourcesDto.setCode(role.getCode());
             resourcesDto.setResourceType(ResourceItemDto.ResourceType.API.getValue());
             // 获取角色资源
             RoleAuthorizedResourcePaginatedRespDto roleAuthorizedResources = managementClient.getRoleAuthorizedResources(resourcesDto);
@@ -113,7 +112,7 @@ public class MenuService {
 
     public List<Integer> getAuthingRoleResources(String roleName){
         GetRoleAuthorizedResourcesDto resourcesDto = new GetRoleAuthorizedResourcesDto();
-        resourcesDto.setNamespace(AUTHING_APP_ID);
+        resourcesDto.setNamespace(namespace);
         resourcesDto.setCode(roleName);
         resourcesDto.setResourceType(ResourceItemDto.ResourceType.API.getValue());
         // 获取角色资源
@@ -147,6 +146,8 @@ public class MenuService {
         return menuMapper.getMenus();
     }
 
+    public List<Integer> getAllMenuIds() { return menuMapper.getAllMenuIds(); }
+
     public List<Integer> getMidsByRid(Integer rid) {
         return menuMapper.getMidsByRid(rid);
     }
@@ -169,7 +170,7 @@ public class MenuService {
         List<String> authorizedRoles = new ArrayList<>();
         // 获取全部角色
         ListRolesDto listRolesDto = new ListRolesDto();
-        listRolesDto.setNamespace(AUTHING_APP_ID);
+        listRolesDto.setNamespace(namespace);
         List<RoleDto> roleDtoList = managementClient.listRoles(listRolesDto).getData().getList();
         roleDtoList.forEach(roleDto -> {
             List<Integer> resources = getAuthingRoleResources(roleDto.getCode());

@@ -29,4 +29,5 @@ public interface MenuMapper {
 
     List<Menu> getMenus();
 
+    List<Integer> getAllMenuIds();
 }

@@ -51,8 +51,23 @@ public class selfTest {
 
     @Test
     public void testMag(){
-        ListUsersRequestDto listUsersRequestDto = new ListUsersRequestDto();
-        UserPaginatedRespDto userPaginatedRespDto = managementClient.listUsers(listUsersRequestDto);
+//        GetRoleAuthorizedResourcesDto resourcesDto = new GetRoleAuthorizedResourcesDto();
+//        resourcesDto.setNamespace(namespace);
+//        resourcesDto.setCode("ROLE_train");
+//        resourcesDto.setResourceType(ResourceItemDto.ResourceType.API.getValue());
+//        // 获取角色资源
+//        RoleAuthorizedResourcePaginatedRespDto roleAuthorizedResources = managementClient.getRoleAuthorizedResources(resourcesDto);
+//        List<RoleAuthorizedResourcesRespDto> list = roleAuthorizedResources.getData().getList();
+
+//        IsActionAllowedDto isActionAllowedDto = new IsActionAllowedDto();
+//        isActionAllowedDto.setNamespace(namespace);
+//        isActionAllowedDto.setUserId("637eccbb4fd5272f44b6dc7f");
+//        isActionAllowedDto.setResource("menuId:7");
+//        isActionAllowedDto.setAction("read12312");
+//        IsActionAllowedRespDtp actionAllowed = managementClient.isActionAllowed(isActionAllowedDto);
+
+        List<Integer> allMenuIds = menuService.getAllMenuIds();
+        System.out.println(allMenuIds.toString());
     }
 
 

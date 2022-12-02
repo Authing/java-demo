@@ -65,13 +65,15 @@ public class EmployeeService {
         optionsDto.setFuzzySearchOn(searchList);
         // 获取用户自定义字段
         optionsDto.setWithCustomData(true);
+        // 设置排序方式
         List<SortingDto> sortingDtoList = new ArrayList<>();
         SortingDto sortingDto = new SortingDto();
         sortingDto.setField(SortingDto.Field.USERNAME);
         sortingDto.setOrder(SortingDto.Order.ASC);
+        // 设置分页
         PaginationDto paginationDto = new PaginationDto();
         paginationDto.setPage(page);
-        // authing 分页每页最多 50 条数据
+            // authing 分页每页最多 50 条数据
         if(limit > 50){
             return new RespPageBean();
         }

@@ -59,6 +59,9 @@
   <select id="getMenus" resultMap="BaseResultMap">
     select * from menu m order by m.`id`
   </select>
+  <select id="getAllMenuIds" resultType="java.lang.Integer">
+    select id from menu m order by m.`id`
+  </select>
   <select id="getAllMenusWithRole" resultMap="MenuWithRole">
     select m.*,r.`id` as rid,r.`name` as rname,r.`nameZh` as rnameZh from menu m,menu_role mr,role r where m.`id`=mr.`mid` and mr.`rid`=r.`id` order by m.`id`
   </select>

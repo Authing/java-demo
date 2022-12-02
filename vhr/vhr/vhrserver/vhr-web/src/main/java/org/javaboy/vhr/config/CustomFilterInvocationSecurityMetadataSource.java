@@ -11,6 +11,7 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,13 +36,12 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         // 获取请求 url
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
         List<Menu> menus = menuService.getMenus();
-        Integer targetMenuId = 0;
+        List<String> authorizedRoles = new ArrayList<>();
         for (Menu menu : menus) {
             if (antPathMatcher.match(menu.getUrl(), requestUrl)) {
-                targetMenuId = menu.getId();
+                authorizedRoles = menuService.selectAuthorizedRoles(menu.getId());
             }
         }
-        List<String> authorizedRoles = menuService.selectAuthorizedRoles(targetMenuId);
         if(authorizedRoles.size() != 0) {
             return SecurityConfig.createList(authorizedRoles.toArray(new String[authorizedRoles.size()]));
         }

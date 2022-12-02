@@ -5,10 +5,10 @@
                 <el-table-column type="selection" align="left" width="55"></el-table-column>
                 <el-table-column prop="name" label="姓名" fixed width="120" align="left"></el-table-column>
                 <el-table-column prop="workID" label="工号" width="120" align="left"></el-table-column>
-                <el-table-column prop="email" label="电子邮件" width="200" align="left"></el-table-column>
-                <el-table-column prop="phone" label="电话号码" width="120" align="left"></el-table-column>
+                <el-table-column prop="beginDate" label="入职日期" width="200" align="left"></el-table-column>
+                <el-table-column prop="position.name" label="职位" width="120" align="left"></el-table-column>
                 <el-table-column prop="department.name" label="所属部门" width="120" align="left"></el-table-column>
-                <el-table-column label="所属部门" align="center">
+                <el-table-column label="目前工资套账" align="center">
                     <template slot-scope="scope">
                         <el-tooltip placement="right" v-if="scope.row.salary">
                             <div slot="content">
@@ -93,6 +93,8 @@
                         background
                         @size-change="sizeChange"
                         @current-change="currentChange"
+                        :page-sizes="[10, 20, 30, 40, 50]"
+                        :page-size="10"
                         layout="sizes, prev, pager, next, jumper, ->, total, slot"
                         :total="total">
                 </el-pagination>
@@ -129,7 +131,9 @@
             },
             hidePop(data) {
                 if (this.currentSalary) {
-                    this.putRequest('/salary/sobcfg/?eid=' + data.id + '&sid=' + this.currentSalary).then(resp => {
+                    data.salaryId = this.currentSalary;
+                    console.log("resdata:",data)
+                    this.putRequest('/salary/sobcfg/',data).then(resp => {
                         if (resp) {
                             this.initEmps()
                         }

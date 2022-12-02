@@ -8,6 +8,7 @@ import org.javaboy.vhr.model.Department;
 import org.javaboy.vhr.model.RespBean;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class DepartmentService {
     ManagementClient managementClient;
     @Autowired
     AuthingDepToDepConverter authingDepToDepConverter;
+
     public List<Department> getAllDepartments() {
         return departmentMapper.getAllDepartmentsByParentId(-1);
     }

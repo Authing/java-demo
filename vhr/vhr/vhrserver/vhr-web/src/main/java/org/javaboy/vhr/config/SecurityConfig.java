@@ -168,7 +168,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/logout")
                 .deleteCookies("JSESSIONID")
                 .logoutSuccessHandler((req, resp, authentication) -> {
-                            // 添加自定义逻辑，撤销 authing accessToken
+                            // 添加自定义登出逻辑，撤销 authing accessToken
                             if(StrUtil.isNotBlank(req.getParameter("accessToken"))) {
                                 authenticationClient.revokeToken(req.getParameter("accessToken"));
                             }
@@ -196,6 +196,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             out.close();
                         }
                 );
+        // TODO 多端登录不踢下线
         http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry(), event -> {
                 HttpServletResponse resp = event.getResponse();
                 resp.setContentType("application/json;charset=utf-8");
