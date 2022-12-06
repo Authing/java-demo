@@ -140,9 +140,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         loginFilter.setAuthenticationManager(authenticationManagerBean());
         // 登录接口
         loginFilter.setFilterProcessesUrl("/doLogin");
-        ConcurrentSessionControlAuthenticationStrategy sessionStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
-        sessionStrategy.setMaximumSessions(1);
-        loginFilter.setSessionAuthenticationStrategy(sessionStrategy);
+        // 原本的多端登录踢下线功能
+//        ConcurrentSessionControlAuthenticationStrategy sessionStrategy = new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
+//        sessionStrategy.setMaximumSessions(1);
+//        loginFilter.setSessionAuthenticationStrategy(sessionStrategy);
         return loginFilter;
     }
 
@@ -197,15 +198,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         }
                 );
         // TODO 多端登录不踢下线
-        http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry(), event -> {
-                HttpServletResponse resp = event.getResponse();
-                resp.setContentType("application/json;charset=utf-8");
-                resp.setStatus(401);
-                PrintWriter out = resp.getWriter();
-                out.write(new ObjectMapper().writeValueAsString(RespBean.error("您已在另一台设备登录，本次登录已下线!")));
-                out.flush();
-                out.close();
-        }), ConcurrentSessionFilter.class);
+//        http.addFilterAt(new ConcurrentSessionFilter(sessionRegistry(), event -> {
+//                HttpServletResponse resp = event.getResponse();
+//                resp.setContentType("application/json;charset=utf-8");
+//                resp.setStatus(401);
+//                PrintWriter out = resp.getWriter();
+//                out.write(new ObjectMapper().writeValueAsString(RespBean.error("您已在另一台设备登录，本次登录已下线!")));
+//                out.flush();
+//                out.close();
+//        }), ConcurrentSessionFilter.class);
         // 自定义 filter 替换 UsernamePasswordAuthenticationFilter
         http.addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class);
     }

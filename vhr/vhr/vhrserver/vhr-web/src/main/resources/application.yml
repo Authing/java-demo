@@ -16,7 +16,8 @@ spring:
     database: 0
     port: 6379
   cache:
-    cache-names: menus_cache
+    cache-names:
+      - menus_cache
 server:
   port: 8081
   compression:
@@ -26,9 +27,9 @@ fastdfs:
     host: http://192.168.91.128/
 authing:
   config:
-    appId: AUTHING_APP_ID
-    appSecret: AUTHING_APP_SECRET
-    appHost: AUTHING_APP_HOST
-    userPoolId: AUTHING_USERPOOL_ID
-    userPoolSecret: AUTHING_USERPOOL_SECRET
-    redirectUri: AUTHING_REDIRECT_URI
+    appId: 637ecbd24f933bcfd0b0a31e
+    appSecret: 273360dddea3702eae1bbb7b42dd21d0
+    appHost: https://kuluqi5.authing.cn
+    userPoolId: 637ecbd1ed27599255387fa1
+    userPoolSecret: e52bdf290082ada8854af4924fd56e32
+    redirectUri: http://127.0.0.1:8081/callback

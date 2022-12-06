@@ -11,6 +11,7 @@
                 :props="defaultProps"
                 :expand-on-click-node="false"
                 :filter-node-method="filterNode"
+                :default-expand-all = "true"
                 ref="tree">
             <span class="custom-tree-node" style="display: flex;justify-content: space-between;width: 100%;"
                   slot-scope="{ node, data }">
@@ -141,7 +142,7 @@
             },
             deleteDep(data) {
                 if (data.parent) {
-                    this.$message.error("父部门删除失败,必须要先删除所有的子部门");
+                    this.$message.error("必须要先删除所有的子部门才能删除父部门！");
                 } else {
                     this.$confirm('此操作将永久删除【' + data.name + '】部门, 是否继续?', '提示', {
                         confirmButtonText: '确定',
@@ -171,7 +172,6 @@
             },
             initDeps() {
                 this.getRequest("/system/basic/department/").then(resp => {
-                    console.log("deps:",resp)
                     if (resp) {
                         this.deps = resp;
                     }

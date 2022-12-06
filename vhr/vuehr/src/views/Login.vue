@@ -23,7 +23,7 @@
                           placeholder="点击图片更换验证码" @keydown.enter.native="submitLogin" style="width: 250px"></el-input>
                 <img :src="vcUrl" @click="updateVerifyCode" alt="" style="cursor: pointer">
             </el-form-item>
-            <el-checkbox size="normal" class="loginRemember" v-model="checked">记住我</el-checkbox>
+            <!-- <el-checkbox size="normal" class="loginRemember" v-model="checked">记住我</el-checkbox> -->
             <el-button size="normal" type="primary" style="width: 100%;" @click="submitLogin">登录</el-button>
         </el-form>
     </div>

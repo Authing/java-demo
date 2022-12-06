@@ -285,6 +285,14 @@ public class ConsumerController {
             return new ErrorMessage("accessToken失效，请重新登录").getMessage();
         }
 
+        List<RoleDto> authingRoleList = this.getUserRolesByAccessToken(accessToken);
+        for(RoleDto roleDto : authingRoleList){
+            if(StrUtil.equals(roleDto.getCode(),RoleCodeEnum.ADMIN.getValue()) ||
+                    StrUtil.equals(roleDto.getCode(),RoleCodeEnum.SUPER_ADMIN.getValue())){
+                return new ErrorMessage("管理员不允许自我注销！").getMessage();
+            }
+        }
+
         authenticationClient.setAccessToken(accessToken);
         String password = req.getParameter("password");
 
@@ -352,6 +360,13 @@ public class ConsumerController {
     public Object updatePassword(HttpServletRequest req,@CookieValue(value = "userAccessToken",required = false) String accessToken) {
         if(StrUtil.isBlank(accessToken)) {
             return new ErrorMessage("accessToken失效，请重新登录").getMessage();
+        }
+        List<RoleDto> authingRoleList = this.getUserRolesByAccessToken(accessToken);
+        for(RoleDto roleDto : authingRoleList){
+            if(StrUtil.equals(roleDto.getCode(),RoleCodeEnum.ADMIN.getValue()) ||
+                    StrUtil.equals(roleDto.getCode(),RoleCodeEnum.SUPER_ADMIN.getValue())){
+                return new ErrorMessage("不允许修改管理员的密码！").getMessage();
+            }
         }
         // 配置 accessToken
         authenticationClient.setAccessToken(accessToken);
@@ -434,6 +449,17 @@ public class ConsumerController {
         }else{
             return new ErrorMessage("撤销accessToken出错").getMessage();
         }
+    }
+
+    /**
+     * 通过 accessToken 获取用户角色
+     */
+    public List<RoleDto> getUserRolesByAccessToken(String accessToken){
+        GetMyRoleListDto reqDto = new GetMyRoleListDto();
+        reqDto.setNamespace(AUTHING_APP_ID);
+        authenticationClient.setAccessToken(accessToken);
+        RoleListRespDto respDto = authenticationClient.getRoleList(reqDto);
+        return respDto.getData();
     }
 
     /**

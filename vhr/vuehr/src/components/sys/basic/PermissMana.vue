@@ -35,6 +35,10 @@
                                     ref="tree"
                                     :key="index"
                                     :default-checked-keys="selectedMenus"
+                                    v-loading="treeLoading"
+                                    element-loading-text="正在加载..."
+                                    element-loading-spinner="el-icon-loading"
+                                    element-loading-background="rgba(0, 0, 0, 0.8)"
                                     :data="allmenus" :props="defaultProps"></el-tree>
                             <div style="display: flex;justify-content: flex-end">
                                 <el-button @click="cancelUpdate">取消修改</el-button>
@@ -62,6 +66,7 @@
                 selectedMenus: [],
                 roles: [],
                 loading: false,
+                treeLoading: false,
                 globalLoading: false,
                 defaultProps: {
                     children: 'children',
@@ -132,8 +137,9 @@
                 }
             },
             initSelectedMenus(roleName) {
-                
-                this.getRequest("/system/basic/permission/mids/" + roleName).then(resp => {                 
+                this.treeLoading = true;
+                this.getRequest("/system/basic/permission/mids/" + roleName).then(resp => {   
+                    this.treeLoading = false;         
                     if (resp) {
                         this.selectedMenus = resp;
                     }
