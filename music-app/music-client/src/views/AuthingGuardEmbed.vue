@@ -38,22 +38,38 @@
     })
 
     async function AuthingLogin() {
+        // let token = "";
         // 使用 start 方法挂载 Guard 组件到你指定的 DOM 节点，登录成功后返回 userInfo
-        guard.start("#authing-guard-container")
+        guard.start("#authing-guard-container").then(async(userInfo: User) => {
+          console.log("userInfo1: ", userInfo);
+          proxy.$store.commit("setUserId", userInfo.id);
+          proxy.$store.commit("setUsername", userInfo.username);
+          proxy.$store.commit("setToken", true);
+          cookies.set("GuardLogin", true);
+          // token = userInfo.token;
+          const params = new URLSearchParams();
+          // console.log("token:",userInfo.token)
+          params.append("token", userInfo.token);
+          const result = (await HttpManager.getAccessTokenByToken(params)) as ResponseBody
+          cookies.set("userAccessToken",result.data);
 
-        const userInfo: User | null = await guard.trackSession()
-        proxy.$store.commit("setUserId", userInfo.id);
-        proxy.$store.commit("setUsername", userInfo.username);
-        proxy.$store.commit("setToken", true);
-        cookies.set("GuardLogin", true);
+          changeIndex(NavName.Home);
+          routerManager(RouterName.Home, { path: RouterName.Home });
+        });
 
-        const params = new URLSearchParams();
-        params.append("token", userInfo.token);
-        const result = (await HttpManager.getAccessTokenByToken(params)) as ResponseBody
-        cookies.set("userAccessToken",result.data);
+        // const userInfo: User | null = await guard.trackSession()
+        // console.log("userInfo:",userInfo)
 
-        changeIndex(NavName.Home);
-        routerManager(RouterName.Home, { path: RouterName.Home });
+        // if(token){
+        // const params = new URLSearchParams();
+        // console.log("token:",token)
+        // params.append("token", token);
+        // const result = (await HttpManager.getAccessTokenByToken(params)) as ResponseBody
+        // cookies.set("userAccessToken",result.data);
+
+        // changeIndex(NavName.Home);
+        // routerManager(RouterName.Home, { path: RouterName.Home });
+        // }
     }
     onMounted(() => {
       AuthingLogin();

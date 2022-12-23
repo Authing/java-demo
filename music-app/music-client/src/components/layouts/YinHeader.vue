@@ -78,6 +78,7 @@ export default defineComponent({
       if (path == RouterName.SignOut) {
         proxy.$store.commit("setToken", false);
         if(cookies.isKey("GuardLogin")){
+          console.log("GuardLogout")
           // 登出后的回调地址请在 Authing 控制台应用 -> 自建应用 -> 应用详情 -> 应用配置 -> 登出回调 URL 中配置
           const res = await guard.logout();
           cookies.remove("GuardLogin");
