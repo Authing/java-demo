@@ -33,6 +33,9 @@ app.use(
     // 如果你配置了多个回调地址，也可以手动指定（此地址也需要加入到应用的「登录回调 URL」中）：
     redirectUri: "http://127.0.0.1:8080/callback",
     // mode: "normal",
+    // config: {
+    //   socialConnectionList: ["github"],
+    // },
   })
 );
 app.use(store).use(router).use(ElementPlus).mount("#app");

@@ -30,12 +30,13 @@
 
         // 2. 处理完 handleRedirectCallback 之后，你需要先检查用户登录态是否正常
         const loginStatus: JwtTokenStatus | undefined = await guard.checkLoginStatus()
-        // console.log("loginStatus:",loginStatus)
+        console.log("loginStatus:",loginStatus)
 
         if (!loginStatus) {
-            guard.startWithRedirect({
-                scope: 'openid profile'
-            })
+            // guard.startWithRedirect({
+            //     scope: 'openid profile'
+            // })
+            routerManager(RouterName.SignIn, { path: RouterName.SignIn });
             console.error("用户信息未获取到")
             return
         }else{
@@ -72,9 +73,11 @@
         // 从 URL search 中解析 state
     } catch (e) {
         // 登录失败，推荐再次跳转到登录页面
-        guard.startWithRedirect({
-            scope: 'openid profile'
-        })
+        // guard.startWithRedirect({
+        //     scope: 'openid profile'
+        // })
+        console.log("1")
+        routerManager(RouterName.SignIn, { path: RouterName.SignIn });
     }
     }
 
