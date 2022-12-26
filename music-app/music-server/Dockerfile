@@ -5,7 +5,6 @@ ADD ./src src/
 ADD ./img img/
 ADD ./song song/
 
-
 RUN mvn clean package -DskipTests=true -P pre
 
 From maven:3.8.4-openjdk-8
