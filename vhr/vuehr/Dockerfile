@@ -12,6 +12,6 @@ WORKDIR /app
 COPY --from=builder /builder/dist .
 COPY .docker/eadmin.conf /etc/nginx/conf.d/
 
-EXPOSE 8083
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
