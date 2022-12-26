@@ -1,7 +1,7 @@
 FROM node:16-alpine as builder
 
 WORKDIR /builder
-# RUN npm config set registry https://registry.npmmirror.com
+RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
 COPY package*.json .
 RUN cnpm install
