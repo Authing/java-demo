@@ -13,4 +13,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder target/*.jar /app/music-server.jar
 EXPOSE 8888
-ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /app/music-server.jar --spring.config.location=/etc/authing/application.properties "]
+ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /app/music-server.jar --spring.config.location=/etc/authing/application.properties"]

@@ -9,4 +9,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder vhrserver/vhr-web/target/*.jar /app/vhrserver.jar
 EXPOSE 8081
-ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /app/vhrserver.jar --spring.config.location=/etc/authing/application.yaml "]
+ENTRYPOINT ["sh","-c","java -jar $JAVA_OPTS /app/vhrserver.jar --spring.config.location=/etc/authing/application.yaml"]
