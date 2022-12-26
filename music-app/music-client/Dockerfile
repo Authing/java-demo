@@ -10,7 +10,7 @@ RUN npm run build
 FROM nginx:alpine
 WORKDIR /app
 COPY --from=builder /builder/dist .
-COPY .docker/eadmin.conf /etc/nginx/conf.d/
+COPY .docker/music-client.conf /etc/nginx/conf.d/
 
 EXPOSE 8082
 
