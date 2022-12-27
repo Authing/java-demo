@@ -3,7 +3,7 @@ FROM node:16-alpine as builder
 WORKDIR /builder
 RUN npm config set registry https://registry.npmmirror.com
 COPY . .
-RUN npm install && npm run build
+RUN yarn && yarn build
 
 FROM nginx:alpine
 WORKDIR /app
