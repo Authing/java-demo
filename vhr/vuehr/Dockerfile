@@ -1,8 +1,9 @@
 FROM node:16-alpine as builder
 
 WORKDIR /builder
+RUN npm config set registry https://registry.npmmirror.com && npm install -g cnpm --registry=https://registry.npmmirror.com
 COPY . .
-RUN yarn && yarn build
+RUN cnpm install && npm run build
 
 FROM nginx:alpine
 WORKDIR /app
