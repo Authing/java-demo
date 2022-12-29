@@ -1,9 +1,6 @@
 FROM maven:3.8.4-openjdk-8 AS builder
 COPY settings.xml /usr/share/maven/conf/settings.xml
-ADD ./pom.xml pom.xml
-ADD ./src src/
-ADD ./img img/
-ADD ./song song/
+ADD . .
 
 RUN mvn clean package -DskipTests=true -P pre
 
