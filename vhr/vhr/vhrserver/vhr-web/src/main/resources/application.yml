@@ -2,19 +2,20 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
-    password: lxy17305692312.
-    url: jdbc:mysql://localhost:3306/vhr?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-  rabbitmq:
-    username: guest
-    password: guest
-    host: 127.0.0.1
-#    publisher-confirms: true
-    publisher-returns: true
-    port: 5672
+    password: Authing@123
+    url: jdbc:mysql://123.57.234.59:3306/vhr?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+#  rabbitmq:
+#    username: guest
+#    password: guest
+#    host: 127.0.0.1
+##    publisher-confirms: true
+#    publisher-returns: true
+#    port: 5672
   redis:
-    host: 127.0.0.1
+    host: 123.57.234.59
     database: 0
     port: 6379
+    password: 123456
   cache:
     cache-names:
       - menus_cache
@@ -32,4 +33,4 @@ authing:
     appHost: https://kuluqi5.authing.cn
     userPoolId: 637ecbd1ed27599255387fa1
     userPoolSecret: e52bdf290082ada8854af4924fd56e32
-    redirectUri: http://127.0.0.1:8081/callback
+    redirectUri: http://123.57.234.59:8081/callback

@@ -36,7 +36,7 @@
         data() {
             return {
                 loading: false,
-                vcUrl: '/verifyCode?time='+new Date(),
+                vcUrl: '/api/verifyCode?time='+new Date(),
                 loginForm: {
                     username: 'vhr_admin',
                     password: '123456',
@@ -52,7 +52,7 @@
         },
         methods: {
             updateVerifyCode() {
-                this.vcUrl = '/verifyCode?time='+new Date();
+                this.vcUrl = '/api/verifyCode?time='+new Date();
             },
             submitLogin() {
                 this.$refs.loginForm.validate((valid) => {
@@ -66,7 +66,7 @@
                                 let path = this.$route.query.redirect;
                                 this.$router.replace((path == '/' || path == undefined) ? '/home' : path);
                             }else{
-                                this.vcUrl = '/verifyCode?time='+new Date();
+                                this.vcUrl = '/api/verifyCode?time='+new Date();
                             }
                         })
                     } else {

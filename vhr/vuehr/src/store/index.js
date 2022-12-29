@@ -56,25 +56,25 @@ const store = new Vuex.Store({
     },
     actions: {
         connect(context) {
-            context.state.stomp = Stomp.over(new SockJS('/ws/ep'));
-            context.state.stomp.connect({}, success => {
-                context.state.stomp.subscribe('/user/queue/chat', msg => {
-                    let receiveMsg = JSON.parse(msg.body);
-                    if (!context.state.currentSession || receiveMsg.from != context.state.currentSession.username) {
-                        Notification.info({
-                            title: '【' + receiveMsg.fromNickname + '】发来一条消息',
-                            message: receiveMsg.content.length > 10 ? receiveMsg.content.substr(0, 10) : receiveMsg.content,
-                            position: 'bottom-right'
-                        })
-                        Vue.set(context.state.isDot, context.state.currentHr.username + '#' + receiveMsg.from, true);
-                    }
-                    receiveMsg.notSelf = true;
-                    receiveMsg.to = receiveMsg.from;
-                    context.commit('addMessage', receiveMsg);
-                })
-            }, error => {
+            // context.state.stomp = Stomp.over(new SockJS('/ws/ep'));
+            // context.state.stomp.connect({}, success => {
+            //     context.state.stomp.subscribe('/user/queue/chat', msg => {
+            //         let receiveMsg = JSON.parse(msg.body);
+            //         if (!context.state.currentSession || receiveMsg.from != context.state.currentSession.username) {
+            //             Notification.info({
+            //                 title: '【' + receiveMsg.fromNickname + '】发来一条消息',
+            //                 message: receiveMsg.content.length > 10 ? receiveMsg.content.substr(0, 10) : receiveMsg.content,
+            //                 position: 'bottom-right'
+            //             })
+            //             Vue.set(context.state.isDot, context.state.currentHr.username + '#' + receiveMsg.from, true);
+            //         }
+            //         receiveMsg.notSelf = true;
+            //         receiveMsg.to = receiveMsg.from;
+            //         context.commit('addMessage', receiveMsg);
+            //     })
+            // }, error => {
 
-            })
+            // })
         },
         initData(context) {
             context.commit('INIT_DATA')
