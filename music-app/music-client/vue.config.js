@@ -7,7 +7,7 @@ module.exports = defineConfig({
   chainWebpack: config => {
     config.plugin('define').tap(definitions => {
         Object.assign(definitions[0]['process.env'], {
-          NODE_HOST: '"http://123.57.234.59:8889/api"',
+          NODE_HOST: '"http://playground-b2c-client.authing.co/api"',
         });
         return definitions;
     });
